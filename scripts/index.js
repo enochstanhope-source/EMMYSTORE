@@ -70,30 +70,73 @@ navButtons.forEach((button, index) => {
 
 // Don't clear the active state when clicking the page body — keep nav selection until another nav is clicked.
 
-// Cart button functionality with spring animation
-const cartButtons = document.querySelectorAll('.card-btn');
-cartButtons.forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.stopPropagation();
-        // toggle animation class to run CSS-based spring animation
-        this.classList.remove('spring-anim');
-        // Force reflow to restart the animation
-        void this.offsetWidth;
-        this.classList.add('spring-anim');
-        // cart added - no-op in production
-    });
-});
+// Floating cart buttons were removed; keep code clean without card-btn listeners
 
-// Small cart button inside price pill
-const cartSmallBtns = document.querySelectorAll('.cart-small-btn');
-cartSmallBtns.forEach(btn => {
+// Small inline cart buttons removed - using `.card-add-btn` instead below images
+
+// Add-to-cart buttons below images (none exist currently; price-add-btn used instead)
+
+// Price add buttons (left of price)
+const priceAddBtns = document.querySelectorAll('.price-add-btn');
+// Lightweight cart model using product title and USD price from the DOM only.
+const cart = {
+    items: [], // { title, usd, qty }
+    count: 0,
+    totalUSD: 0
+};
+
+function updateCartUI() {
+    const badge = document.getElementById('cart-count');
+    if (badge) {
+        badge.textContent = String(cart.count);
+    }
+}
+
+function addItemToCart(title, usdPrice) {
+    // Ensure we have numbers
+    const usd = (typeof usdPrice === 'number') ? usdPrice : parseFloat(usdPrice) || 0;
+    const found = cart.items.find(i => i.title === title);
+    if (found) {
+        found.qty += 1;
+    } else {
+        cart.items.push({ title, usd, qty: 1 });
+    }
+    cart.count += 1;
+    cart.totalUSD = cart.items.reduce((s, it) => s + (it.usd * it.qty), 0);
+    updateCartUI();
+}
+priceAddBtns.forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        // toggle smaller spring animation class
         this.classList.remove('spring-anim-small');
         void this.offsetWidth;
         this.classList.add('spring-anim-small');
-        // small add to cart - no-op in production
+        // add-to-cart from price pill — use USD price from DOM only
+        const card = this.closest('.collection-card');
+        if (!card) return;
+        const titleEl = card.querySelector('.card-title');
+        const priceEl = card.querySelector('.price-text, .price');
+        const title = titleEl ? titleEl.textContent.trim() : 'Item';
+        let usdValue = 0;
+        if (priceEl) {
+            // Parse USD from visible text (e.g. "$250.00")
+            const txt = priceEl.textContent || priceEl.innerText || '';
+            const m = txt.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+            usdValue = m ? parseFloat(m[0]) : 0;
+        }
+        addItemToCart(title, usdValue);
+        // Optional: briefly flash a tiny confirmation (use title and price for UX)
+        try {
+            // Create a non-invasive toast that disappears
+            const toast = document.createElement('div');
+            toast.className = 'cart-toast';
+            toast.textContent = `${title} added to cart`;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.classList.add('visible'); }, 10);
+            setTimeout(() => { toast.classList.remove('visible'); setTimeout(() => toast.remove(), 300); }, 2000);
+        } catch (err) {
+            // ignore
+        }
     });
 });
 
@@ -138,7 +181,22 @@ if (searchInput) {
 const buyNowBtn = document.querySelector('.buy-now-btn');
 if (buyNowBtn) {
     buyNowBtn.addEventListener('click', function() {
-        // buy now clicked - no-op in production
+        // buy now clicked — use the price shown in the first collection card (USD only)
+        const firstCard = document.querySelector('.collections-row .collection-card');
+        if (!firstCard) return;
+        const titleEl = firstCard.querySelector('.card-title');
+        const priceEl = firstCard.querySelector('.price-text, .price');
+        const title = titleEl ? titleEl.textContent.trim() : 'Item';
+        let usdValue = 0;
+        if (priceEl) {
+            const txt = priceEl.textContent || priceEl.innerText || '';
+            const m = txt.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+            usdValue = m ? parseFloat(m[0]) : 0;
+        }
+        addItemToCart(title, usdValue);
+        try {
+            alert(`Buy now: ${title} — total (USD) $${usdValue}`);
+        } catch (e) { console.log('buy now', title, usdValue); }
     });
 }
 
@@ -215,9 +273,8 @@ if (hamburgerBtn) {
 
 // No scroll/resize listeners to keep runtime cost low
 
-// Initial setup
+// Initial setup: Ensure Home nav is active and first card is visible
 document.addEventListener('DOMContentLoaded', function() {
-    // Ensure Home (first nav button) is active by default on page load/refresh
     if (navButtons && navButtons.length) {
         navButtons.forEach((btn, idx) => {
             if (idx === 0) {
@@ -229,53 +286,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    // Fashion Store loaded
-    // Convert USD prices to NGN at a fixed rate (300 NGN per 1 USD)
-    const USD_TO_NGN = 300;
-    const ngnFormatter = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 });
-
-    function parseUsdFromString(text) {
-        if (!text) return null;
-        // remove commas and non-dot/digits (support decimals), then parse
-        const cleaned = text.replace(/,/g, '').replace(/[^(\d|\.)-]/g, '');
-        const matched = cleaned.match(/-?\d+(?:\.\d+)?/);
-        return matched ? parseFloat(matched[0]) : null;
-    }
-
-    function convertToNgn(usdAmount) {
-        if (typeof usdAmount !== 'number' || isNaN(usdAmount)) return null;
-        return Math.round(usdAmount * USD_TO_NGN);
-    }
-
-    function convertAllPrices(rate = USD_TO_NGN) {
-        const priceEls = document.querySelectorAll('.price-text, .price');
-        priceEls.forEach(el => {
-            // Preserve original USD if not already stored
-            if (!el.dataset.usd) {
-                const usd = parseUsdFromString(el.textContent || el.innerText);
-                if (usd === null) return; // skip if cannot parse
-                el.dataset.usd = usd;
-            }
-            const usdVal = parseFloat(el.dataset.usd);
-            if (isNaN(usdVal)) return;
-            const ngn = Math.round(usdVal * rate);
-            el.dataset.ngn = ngn;
-            // Format as NGN currency for display
-            el.textContent = ngnFormatter.format(ngn);
-        });
-    }
-
-    // Run conversion on load
-    convertAllPrices(USD_TO_NGN);
-
-    // Ensure the first collection card is visible on initial load (not sticky — all cards scroll naturally)
+    // Ensure the first collection card is visible on initial load
     const collectionsRow = document.querySelector('.collections-row');
     if (collectionsRow) {
-        // Set scroll to leftmost content — keep the first card visible
         try {
             collectionsRow.scrollTo({ left: 0, behavior: 'auto' });
         } catch (e) {
-            // fallback for older browsers
             collectionsRow.scrollLeft = 0;
         }
         const firstCard = collectionsRow.querySelector('.collection-card');
@@ -288,13 +304,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const menuEl = document.getElementById('main-menu');
         if (menuEl) {
             const attr = menuEl.getAttribute('aria-hidden');
-            // default to hidden if attribute isn't set or is 'true'
             menuEl.hidden = attr !== 'false';
         }
-    } catch (e) {
-        // no-op
-    }
-    // compute and set header height CSS variable so menu begins below header
+    } catch (e) {}
+    // Set header height CSS variable
     function setHeaderHeightVar() {
         try {
             const header = document.querySelector('.header');
@@ -303,12 +316,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 const h = header.getBoundingClientRect().height;
                 root.style.setProperty('--header-height', Math.round(h) + 'px');
             }
-        } catch (e) {
-            // ignore
-        }
+        } catch (e) {}
     }
     setHeaderHeightVar();
-    // update on resize so the menu's top remains correct
     window.addEventListener('resize', setHeaderHeightVar);
 });
 
