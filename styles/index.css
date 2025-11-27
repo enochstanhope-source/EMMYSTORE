@@ -474,14 +474,15 @@ body {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 100%);
+    background: linear-gradient(180deg, rgba(117, 112, 112, 0.15) 0%, rgba(17, 3, 3, 0.35) 100%);
     z-index: 1; /* sits above the image but below the content */
 }
 
 /* Categories Section */
 .categories-section {
     padding: 12px 12px 8px; /* reduce padding for a thinner section */
-    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+    background: linear-gradient(180deg,#807e7e, #e6781e54);
+    
     margin: 8px 12px 0 12px; /* slightly less vertical space */
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.06);
@@ -519,14 +520,14 @@ body {
 
 .categories-section h3 {
     font-size: 16px;
-    font-weight: 700;
-    color: #1a1a1a;
+    font-weight: 800;
+    color: #ffffff;
     margin-bottom: 10px; /* reduced spacing to reduce overall height */
 }
 
 @media (min-width: 769px) {
     .categories-section h3 {
-        font-size: 18px;
+        font-size: 28px;
     }
 }
 
@@ -544,6 +545,8 @@ body {
     -webkit-overflow-scrolling: touch;
     /* Subtle accent border using the gold color to blend with the design */
     border-left: 4px solid rgba(205,162,79,0.06);
+    /* Merge background from the section to create a single background feel */
+    background: transparent; /* let the section gradient show through */
     padding-left: 12px; /* leave room for the border */
     /* gently lift on hover to emphasize interactivity */
     transition: box-shadow 220ms ease, transform 220ms ease;
@@ -571,7 +574,7 @@ body {
     border: none;
     border-radius: 14px;
     font-size: 13px;
-    color: #6b6b6b;
+    color: #000000;
     cursor: pointer;
     white-space: nowrap;
     display: inline-flex;
@@ -580,7 +583,8 @@ body {
     justify-content: center;
     gap: 6px; /* space between avatar and label */
     font-weight: 600;
-    transition: transform 0.28s cubic-bezier(.2,.8,.2,1), box-shadow 0.28s ease, border-color 0.2s ease;
+    transition: transform 0.28s cubic-bezier(.2,.8,.2,1), box-shadow 0.28s ease, border-color 0.2s ease, background 0.28s ease;
+    overflow: visible; /* ensure child avatar or shadows do not clip the outer border */
     flex-shrink: 0;
     scroll-snap-align: start; /* snap each button to the display start */
 }
@@ -591,14 +595,29 @@ body {
 
 .category-btn.active {
     background: linear-gradient(180deg, rgba(205,162,79,0.12), rgba(205,162,79,0.02));
-    color: #111;
+    color: #f0f0f0;
     font-weight: 800;
     border: 1px solid rgba(205,162,79,0.14);
     transform: translateY(-4px) scale(1.02);
     box-shadow: 0 12px 34px rgba(6, 8, 17, 0.12);
 }
 
-.category-btn.active span { color: #111; }
+/* Slightly higher opacity for the 'All' category when active so the background
+   stands out a little more and appears subtly de-emphasized compared to the
+   avatar ring. This targets the button itself (not the avatar) and keeps the
+   active styling consistent. */
+.category-btn.category-all.active {
+    background: linear-gradient(180deg, rgba(199, 138, 16, 0.527), rgba(205,162,79,0.04));
+    /* Make the border solid and visible around the entire button */
+    border: 2px solid rgba(205,162,79,0.95);
+    border-style: solid;
+    /* Keep the background clipped to padding so the border isn't visually broken */
+    background-clip: padding-box;
+}
+
+
+
+.category-btn.active span { color: #ffffff; }
 
 /* support accessible pressed state - if JS toggles aria-pressed */
 .category-btn[aria-pressed="true"] { box-shadow: 0 12px 34px rgba(6, 8, 17, 0.12); transform: translateY(-4px) scale(1.02); }
@@ -606,17 +625,18 @@ body {
 .category-btn img { display: block; width: 100%; height: 100%; border-radius: inherit; }
 
 .category-avatar {
-    width: 44px; /* slightly smaller for compact layout */
-    height: 44px;
+    width: 49px; /* slightly smaller for compact layout */
+    height: 49px;
     border-radius: 50%;
     overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: #ffffff; /* white circle backdrop */
-    padding: 3px; /* small inset so image doesn't touch the edges */
+    padding: 5px; /* small inset so image doesn't touch the edges; increased for more pronounced ring */
     box-shadow: 0 8px 20px rgba(6, 8, 17, 0.07);
-    border: 2px solid rgba(205,162,79,0.08); /* subtle accent ring */
+    border: 1px solid rgba(205,162,79,0.08); /* reduced thin accent ring */
+    transition: transform 220ms cubic-bezier(.2,.9,.2,1), border-color 220ms ease, box-shadow 220ms ease;
 }
 
 /* Slight subtle hover on the active item to indicate it's interactive */
@@ -652,11 +672,12 @@ body {
 
 /* Distinct 'All' avatar with gold gradient */
 .category-all .all-avatar {
-    background: linear-gradient(180deg, #fef7ec, #fff6e6);
-    border: 2px solid rgba(205,162,79,0.20);
-    box-shadow: 0 6px 18px rgba(205,162,79,0.04);
+    background: linear-gradient(180deg, #c7b9b9, #010408);
+    /* Ensure the avatar ring is a solid accent color and matches the outer border */
+    border: 2px solid rgba(205,162,79,0.95);
+    box-shadow: 0 6px 18px rgba(8, 6, 2, 0.925);
 }
-.category-all .all-text { color: #4b4b4b; font-size: 13px; font-weight: 300; }
+.category-all .all-text { color: #fff; font-size: 13px; font-weight: 300; }
 
 /* A subtle fading mask at the right to encourage horizontal scrolling */
 .categories-container::after {
@@ -667,7 +688,8 @@ body {
     bottom: 0;
     width: 38px;
     pointer-events: none;
-    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.94));
+    /* Make the fade transparent so the section's background shows through instead of white */
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0));
 }
 
 .category-btn:active {
@@ -685,7 +707,50 @@ body {
 .category-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 .category-all .all-avatar { display:flex; align-items:center; justify-content:center; }
-.category-all .all-text { font-weight:300; color:#333; padding: 4px 8px; font-size:13px; }
+.category-all .all-text { font-weight:400; color:#fff !important; padding: 4px 8px; font-size:13px; }
+
+/* Ensure 'All' label stays white in active, hover and focus states */
+.category-btn.category-all .all-text,
+.category-btn.category-all.active .all-text,
+.category-btn.category-all:hover .all-text,
+.category-btn.category-all:focus-visible .all-text { color: #fff !important; }
+
+/* Per-category themed avatars and active backgrounds */
+.category-btn.category-man .category-avatar {
+    background: linear-gradient(180deg, #000000, #4b4b4b);
+    border-color: rgba(255, 253, 253, 0.12); /* soft blue ring */
+    box-shadow: 0 6px 14px rgb(0, 0, 0);
+}
+.category-btn.category-man.active { background: linear-gradient(180deg, rgba(31,143,255,0.08), rgba(31,143,255,0.02)); color: #063f83; border: 1px solid rgba(31,143,255,0.14); }
+.category-btn.category-man:hover:not(.active) .category-avatar { transform: translateY(-3px) scale(1.03); border-color: rgba(31,143,255,0.18); }
+
+.category-btn.category-woman .category-avatar {
+ background: linear-gradient(180deg, #000000, #4b4b4b);
+    border-color: rgba(255, 253, 253, 0.12); /* soft blue ring */
+    box-shadow: 0 6px 14px rgb(0, 0, 0);
+}
+.category-btn.category-woman.active { background: linear-gradient(180deg, rgba(31,143,255,0.08), rgba(31,143,255,0.02)); color: #8b205a; border: 1px solid rgba(255,123,180,0.14); }
+.category-btn.category-woman:hover:not(.active) .category-avatar { transform: translateY(-3px) scale(1.03); border-color: rgba(255,123,180,0.18); }
+
+.category-btn.category-kids .category-avatar {
+   background: linear-gradient(180deg, #000000, #4b4b4b);
+    border-color: rgba(255, 253, 253, 0.12); /* soft blue ring */
+    box-shadow: 0 6px 14px rgb(0, 0, 0);
+}
+.category-btn.category-kids.active { background: linear-gradient(180deg, rgba(123,211,137,0.08), rgba(123,211,137,0.02)); color: #196b34; border: 1px solid rgba(123,211,137,0.14); }
+.category-btn.category-kids:hover:not(.active) .category-avatar { transform: translateY(-3px) scale(1.03); border-color: rgba(123,211,137,0.18); }
+
+/* Slight avatar lift on active for all themed categories so the avatar 'pops' */
+.category-btn.category-man.active .category-avatar,
+.category-btn.category-woman.active .category-avatar,
+.category-btn.category-kids.active .category-avatar {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow: 0 14px 40px rgb(202, 80, 10);
+    border-width: 2px;
+}
+
+/* Set a neutral transparent avatar background for any categories that don't provide images */
+.category-btn .category-avatar:empty { background: rgba(255,255,255,0.96); border-color: rgba(205,162,79,0.05); }
 
 /* Collections Section */
 .collections-section {
