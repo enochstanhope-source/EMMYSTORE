@@ -16,6 +16,8 @@ body {
                 linear-gradient(135deg, var(--lux-1) 0%, var(--lux-2) 70%);
     color: #f4f4f4;
     overflow: hidden;
+    -webkit-text-size-adjust: 100%; /* prevent mobile browser text auto-scaling */
+    -ms-text-size-adjust: 100%;
     
 }
 
@@ -120,6 +122,7 @@ body {
     display: flex;
     gap: 12px;
     align-items: center;
+    padding-top: 40px; /* added padding as requested */
 }
 .search-wrapper {
     flex: 1;
@@ -142,8 +145,8 @@ body {
     padding: 12px 16px 12px 42px;
     border: 1px solid rgba(0,0,0,0.04);
     border-radius: 28px;
-    background: #fff;
-    font-size: 15px;
+    background: #efefef; /* make input background grey */
+    font-size: 16px; /* 16px prevents iOS/Android from zooming on focus */
     color: #1a1a1a;
     transition: all 0.3s ease;
     box-shadow: 0 6px 16px rgba(0,0,0,0.06);
@@ -155,7 +158,14 @@ body {
 
 .search-input:focus {
     outline: none;
-    background: #efefef;
+    background: #e8e8e8; /* slightly darker on focus for subtle contrast */
+    box-shadow: 0 0 0 2px rgba(45, 134, 89, 0.1);
+}
+
+/* class-based focus styling for JS-managed focus to avoid inline style overrides */
+.search-input.is-focused {
+    outline: none;
+    background: #e8e8e8;
     box-shadow: 0 0 0 2px rgba(45, 134, 89, 0.1);
 }
 
@@ -850,6 +860,9 @@ body {
     left: 0;
     right: 0;
     height: 90px;
+    min-height: 90px; /* lock height so nav doesn't resize */
+    max-height: 90px;
+    box-sizing: border-box; /* ensure padding doesn't expand the visual size */
     background: linear-gradient(180deg, #1f5f49 0%, #1b4f41 100%);
     display: flex;
     justify-content: space-around;
@@ -859,8 +872,8 @@ body {
     z-index: 1000;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
-   
-    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.14);
+    border: none; /* remove any visible border around the nav */
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.72); /* stronger black shadow */
 }
 
 @media (max-width: 768px) {
@@ -868,13 +881,14 @@ body {
         border-radius: 0;
         padding-left: 21px; /* add horizontal padding for mobile */
         padding-right: 21px;
+        border: none; /* ensure no border from container shows through on mobile */
     }
 }
 
 @media (min-width: 769px) {
     .bottom-nav {
         padding-top: 16px;
-        height: 90px;
+        height: 90px; /* keep same fixed height */
     }
 }
 
@@ -889,7 +903,7 @@ body {
     --nav-duration: 640ms;
     --nav-ease: cubic-bezier(0.18, 0.84, 0.22, 1);
     flex: 1;
-    height: 60px;
+    height: 100%; /* fill the fixed-height bottom-nav so item height is stable */
     border: none;
     background: transparent;
     color: #fff;
@@ -897,7 +911,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center; /* center icon + label vertically inside the fixed height */
     gap: 6px;
     transition: background 360ms ease, transform var(--nav-duration) var(--nav-ease), box-shadow var(--nav-duration) var(--nav-ease), padding 360ms ease, width 360ms ease, flex 360ms ease, max-width 360ms ease, opacity var(--nav-duration) var(--nav-ease);
     transform: translateY(0) scale(1);
@@ -931,7 +945,7 @@ body {
 
 @media (min-width: 769px) {
     .nav-btn {
-        height: 70px;
+        height: 100%; /* keep consistent with bottom nav height */
     }
 }
 
@@ -954,21 +968,21 @@ body {
     border-radius: 12px; /* slightly smaller pill */
     color: #ffffff;
     font-weight: 700;
-    padding: 6px 10px;
-    margin-top: -4px; /* smaller lift for less pop */
-    transform: translateY(-6px) scale(1.01);
-    height: auto;
+    /* keep the nav height constant: do not change flex, height, or margins */
+    padding: 6px 10px; /* horizontal padding ok, vertical padding will be within height */
+    transform: translateY(-4px) scale(1.01); /* only a transform for visual lift - doesn't affect layout */
     opacity: 1;
     box-shadow: 0 8px 20px rgba(10, 10, 10, 0.10), inset 0 1px 0 rgba(255,255,255,0.02);
+    /* keep flex the same to avoid layout change */
     width: auto;
-    flex: 0 0 auto; /* let active button size itself so it becomes a pill while others remain flexible */
+    flex: 1; /* keep equal width, avoid reshaping the nav */
     display: flex; /* keep same display to avoid layout jump */
     flex-direction: column; /* keep icon above label */
     align-items: center;
     justify-content: center;
     gap: 4px;
     backdrop-filter: blur(4px); /* more compact blur */
-    border: 1px solid rgba(255,255,255,0.04);
+    border: none; /* remove white border for active pill */
     transition: transform var(--nav-duration) var(--nav-ease), box-shadow var(--nav-duration) var(--nav-ease), background 360ms ease, flex 360ms ease, width 360ms ease, padding 360ms ease, opacity var(--nav-duration) var(--nav-ease);
 }
 
@@ -1050,14 +1064,14 @@ body {
 
 @media (min-width: 769px) {
     .nav-btn.active {
-        height: 76px;
+        height: 100%; /* keep consistent with fixed bottom nav height */
     }
 }
 
 .nav-icon-wrap {
     display: inline-flex;
-    width: 36px;
-    height: 36px;
+    width: 40px; /* keep default same as active to avoid size shifts */
+    height: 40px;
     align-items: center;
     justify-content: center;
     border-radius: 50%;

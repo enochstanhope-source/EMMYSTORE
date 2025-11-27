@@ -124,12 +124,13 @@ if (searchInput) {
         // search input change - no-op in production
     });
     
+    // Keep focus styling in CSS rather than inline style so we avoid layout jank or overrides
+    // Add/remove a class on focus to handle cases where JS manages focus programmatically
     searchInput.addEventListener('focus', function() {
-        this.style.boxShadow = '0 0 0 3px rgba(45, 134, 89, 0.15)';
+        this.classList.add('is-focused');
     });
-    
     searchInput.addEventListener('blur', function() {
-        this.style.boxShadow = 'none';
+        this.classList.remove('is-focused');
     });
 }
 
