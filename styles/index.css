@@ -21,6 +21,10 @@ body {
     
 }
 
+:root {
+    --nav-height: 90px; /* base nav height which we can use for safe-area adjustments */
+}
+
 .container {
     width: 100%;
     height: 100vh;
@@ -203,7 +207,7 @@ body {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding-bottom: 100px;
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 10px);
     scroll-behavior: smooth;
 }
 
@@ -352,7 +356,7 @@ body {
 
 /* Categories Section */
 .categories-section {
-    padding: 20px 16px;
+    padding: 20px 16px 12px; /* reduce bottom padding to make section more compact */
     background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
     margin: 12px 12px 0 12px; /* float slightly above the container background */
     border-radius: 14px;
@@ -362,7 +366,7 @@ body {
 
 @media (min-width: 769px) {
     .categories-section {
-        padding: 28px 32px;
+        padding: 28px 32px 16px; /* keep larger top/side padding on wide screens, but reduce bottom */
     }
 }
 
@@ -384,7 +388,7 @@ body {
     gap: 12px;
     overflow-x: auto;
     overflow-y: hidden;
-    padding-bottom: 8px;
+    padding-bottom: 6px; /* slightly less, matches reduced section bottom padding */
     scroll-behavior: smooth;
     align-items: center;
 }
@@ -399,7 +403,7 @@ body {
 }
 
 .category-btn {
-    padding: 6px 12px;
+    padding: 4px 10px; /* reduce button padding to fit better with smaller avatar */
     background: transparent;
     border: none;
     border-radius: 22px;
@@ -417,7 +421,7 @@ body {
 }
 
 .category-btn:first-child {
-    padding: 10px 24px;
+    padding: 8px 20px; /* keep first 'All' button a bit larger but reduced */
 }
 
 .category-btn.active {
@@ -448,8 +452,8 @@ body {
 }
 
 .category-avatar {
-    width: 44px;
-    height: 44px;
+    width: 40px; /* slightly smaller avatar to match reduced spacing */
+    height: 40px;
     border-radius: 50%;
     overflow: hidden;
     display: inline-flex;
@@ -859,15 +863,17 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 90px;
-    min-height: 90px; /* lock height so nav doesn't resize */
-    max-height: 90px;
+    height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
+    min-height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px)); /* lock height so nav doesn't resize */
+    max-height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box; /* ensure padding doesn't expand the visual size */
     background: linear-gradient(180deg, #1f5f49 0%, #1b4f41 100%);
     display: flex;
     justify-content: space-around;
     align-items: flex-start;
     padding-top: 18px;
+    padding-bottom: env(safe-area-inset-bottom, 0px); /* respect device safe area */
+    padding-bottom: constant(safe-area-inset-bottom); /* legacy iOS fallback */
     gap: 8px;
     z-index: 1000;
     border-top-left-radius: 0;
@@ -888,7 +894,7 @@ body {
 @media (min-width: 769px) {
     .bottom-nav {
         padding-top: 16px;
-        height: 90px; /* keep same fixed height */
+        height: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px)); /* keep same fixed height with safe-area included */
     }
 }
 
@@ -903,7 +909,7 @@ body {
     --nav-duration: 640ms;
     --nav-ease: cubic-bezier(0.18, 0.84, 0.22, 1);
     flex: 1;
-    height: 100%; /* fill the fixed-height bottom-nav so item height is stable */
+    height: var(--nav-height); /* content height inside nav, keep equal across states */
     border: none;
     background: transparent;
     color: #fff;
@@ -945,7 +951,7 @@ body {
 
 @media (min-width: 769px) {
     .nav-btn {
-        height: 100%; /* keep consistent with bottom nav height */
+        height: var(--nav-height); /* keep consistent with bottom nav height */
     }
 }
 
