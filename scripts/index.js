@@ -142,11 +142,72 @@ if (buyNowBtn) {
     });
 }
 
-// Filter button functionality
-const filterBtn = document.querySelector('.filter-btn');
-if (filterBtn) {
-    filterBtn.addEventListener('click', function() {
-        // filter clicked - no-op in production
+// Hamburger menu functionality (replaces previous filter button)
+const hamburgerBtn = document.querySelector('.hamburger-btn');
+if (hamburgerBtn) {
+    // Ensure aria-expanded starts as a boolean string
+    if (!hamburgerBtn.hasAttribute('aria-expanded')) hamburgerBtn.setAttribute('aria-expanded', 'false');
+
+    const menuId = hamburgerBtn.getAttribute('aria-controls');
+    const menu = menuId ? document.getElementById(menuId) : null;
+
+    // create backdrop for outside clicks (insert once)
+    let backdrop = document.querySelector('.menu-backdrop');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.className = 'menu-backdrop';
+        document.body.appendChild(backdrop);
+    }
+
+    function openMenu() {
+        hamburgerBtn.classList.add('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'true');
+        if (menu) {
+            menu.classList.add('open');
+            menu.setAttribute('aria-hidden', 'false');
+            // ensure element is not hidden (so screen readers find it)
+            menu.hidden = false;
+            // focus the first link for keyboard users
+            const first = menu.querySelector('.menu-link');
+            if (first) first.focus();
+        }
+        backdrop.classList.add('visible');
+    }
+
+    function closeMenu() {
+        hamburgerBtn.classList.remove('open');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+        if (menu) {
+            menu.classList.remove('open');
+            menu.setAttribute('aria-hidden', 'true');
+            // mark as hidden for browsers / screen readers
+            menu.hidden = true;
+        }
+        backdrop.classList.remove('visible');
+    }
+
+    hamburgerBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const willOpen = !this.classList.contains('open');
+        if (willOpen) openMenu(); else closeMenu();
+    });
+
+    // Close when clicking the backdrop
+    backdrop.addEventListener('click', function() { closeMenu(); });
+
+    // Close on outside click also (covers clicks not on backdrop for small edge cases)
+    document.addEventListener('click', function(event) {
+        if (!hamburgerBtn.contains(event.target) && menu && !menu.contains(event.target) && hamburgerBtn.classList.contains('open')) {
+            closeMenu();
+        }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && hamburgerBtn.classList.contains('open')) {
+            closeMenu();
+            hamburgerBtn.focus();
+        }
     });
 }
 
@@ -222,5 +283,32 @@ document.addEventListener('DOMContentLoaded', function() {
             firstCard.scrollIntoView({ behavior: 'auto', inline: 'start', block: 'nearest' });
         }
     }
+    // Ensure `#main-menu` hidden state matches `aria-hidden` on load
+    try {
+        const menuEl = document.getElementById('main-menu');
+        if (menuEl) {
+            const attr = menuEl.getAttribute('aria-hidden');
+            // default to hidden if attribute isn't set or is 'true'
+            menuEl.hidden = attr !== 'false';
+        }
+    } catch (e) {
+        // no-op
+    }
+    // compute and set header height CSS variable so menu begins below header
+    function setHeaderHeightVar() {
+        try {
+            const header = document.querySelector('.header');
+            const root = document.documentElement;
+            if (header && root) {
+                const h = header.getBoundingClientRect().height;
+                root.style.setProperty('--header-height', Math.round(h) + 'px');
+            }
+        } catch (e) {
+            // ignore
+        }
+    }
+    setHeaderHeightVar();
+    // update on resize so the menu's top remains correct
+    window.addEventListener('resize', setHeaderHeightVar);
 });
 
