@@ -6,16 +6,28 @@
 
 body {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-    background: #f5f5f5;
+    /* Luxury gradient background — deep, elegant tones with a soft vignette */
+    --lux-1: #0b1220; /* deep navy/charcoal */
+    --lux-2: #3a1f3d; /* plum */
+    --lux-accent: #cda24f; /* gold accent */
+    --glass: rgba(255,255,255,0.9);
+    --card-shadow: 0 18px 60px rgba(8, 10, 20, 0.5);
+    background: radial-gradient(1200px 600px at 8% 12%, rgba(205,162,79,0.06), transparent 12%),
+                linear-gradient(135deg, var(--lux-1) 0%, var(--lux-2) 70%);
+    color: #f4f4f4;
     overflow: hidden;
-    min-height: 800vh;
+    
 }
 
 .container {
     width: 100%;
     height: 100vh;
     margin: 0 auto;
-    background: linear-gradient(180deg, #fafbff 0%, #f5f7ff 100%);
+    /* Soft glass container so content 'pops' above the luxury background */
+    background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.86) 100%);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px) saturate(120%);
+    box-shadow: var(--card-shadow);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -29,19 +41,44 @@ body {
         max-width: 420px;
         border-radius: 40px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        /* Remove top rounded corners on small screens for a square top */
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        /* Also remove bottom rounded corners so bottom-nav sits flush on mobile */
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
     }
 }
 
+@media (max-width: 768px) {
+    /* Keep spacing but let the header sit naturally; apply padding to main-content so a smaller area.
+        .collection-card {
+            border-radius: 28px;
+            border: 1px solid rgba(15,15,15,0.04);
+            overflow: hidden; /* clip content for rounded corners */
+            background: linear-gradient(180deg, #fffdf8 0%, #fffdf8 100%);
+            transition: transform 0.36s cubic-bezier(.2,.8,.2,1), box-shadow 0.36s ease;
+            padding: 12px; /* add internal padding so image sits in a natural spaced area */
+        }
+       This avoids the white glass container showing at the top edge while retaining content spacing.
+    */
+    .main-content { padding-top: 18px; }
+}
+        .card-background.poncho { background: transparent; }
+
 @media (min-width: 1024px) {
     .container { max-width: 1100px; border-radius: 0; }
+        .card-background.waist { background: transparent; }
 }
 
 /* Header */
 .header {
-    background: #ffffff;
+    /* glass header to match luxury background */
+    background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.92));
     padding: 16px 20px;
-    border-bottom: 1px solid #f0f0f0;
-    flex-shrink: 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+        color: #1a1a1a;
+        font-weight: 800;
 }
 
 @media (min-width: 769px) {
@@ -63,6 +100,7 @@ body {
     color: #000;
     font-weight: 700;
 }
+        
 
 .icons-right {
     display: flex;
@@ -83,7 +121,6 @@ body {
     gap: 12px;
     align-items: center;
 }
-
 .search-wrapper {
     flex: 1;
     position: relative;
@@ -186,8 +223,11 @@ body {
     border-radius: 24px;
     overflow: hidden; /* ensure image and overlay are clipped by rounded borders */
     min-height: 220px; /* default height so image has room; adjust with media queries */
-    box-shadow: 0 8px 24px rgba(240, 217, 242, 0.4);
-    background: linear-gradient(135deg, #ffdff7 0%, #ffe8f8 60%, #fff8fb 100%);
+    /* Premium banner fill: soft glass over a pastel gradient with warm accent */
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%),
+                linear-gradient(135deg, #fff3e6 0%, #ffe5d9 55%, rgba(255, 196, 92, 0.08) 100%);
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 16px 48px rgba(18, 15, 25, 0.32);
 }
 
 @media (max-width: 768px) {
@@ -254,7 +294,7 @@ body {
 
 .buy-now-btn {
     padding: 12px 28px;
-    background: #1a1a1a;
+    background: linear-gradient(180deg, var(--lux-accent), #b6872c);
     color: #fff;
     border: none;
     border-radius: 24px;
@@ -266,9 +306,8 @@ body {
 }
 
 .buy-now-btn:hover {
-    background: #333;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(26, 26, 26, 0.25);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 36px rgba(196, 158, 78, 0.26);
 }
 
 .buy-now-btn:active {
@@ -304,6 +343,11 @@ body {
 /* Categories Section */
 .categories-section {
     padding: 20px 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
+    margin: 12px 12px 0 12px; /* float slightly above the container background */
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 12px 36px rgba(12,12,18,0.12);
 }
 
 @media (min-width: 769px) {
@@ -378,8 +422,9 @@ body {
 .category-btn.active:hover { background: rgba(0,0,0,0.02); transform: none; }
 
 .category-btn:hover:not(.active) {
-    background: #efefef;
+    background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.9));
     transform: translateY(-2px);
+    box-shadow: 0 8px 26px rgba(8,8,8,0.06);
 }
 
 .category-btn:active {
@@ -400,8 +445,8 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #fff;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    background: rgba(255,255,255,0.96);
+    box-shadow: 0 10px 26px rgba(10, 14, 22, 0.08);
     border: 1px solid rgba(0,0,0,0.06);
 }
 
@@ -413,6 +458,59 @@ body {
 /* Collections Section */
 .collections-section {
     padding: 20px 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.86));
+    margin: 12px 12px 24px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 12px 36px rgba(18,16,28,0.10);
+}
+
+/* Premium enhancements for collection cards and price tags */
+.collections-section {
+    /* subtle inner glow, slightly stronger border for premium look */
+    border: 1px solid rgba(205,162,79,0.06);
+    box-shadow: 0 12px 36px rgba(18,16,28,0.10), inset 0 2px 12px rgba(255,255,255,0.03);
+}
+
+.section-header h3 {
+    color: #0d0d0d; /* darker heading for contrast */
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    text-transform: none;
+}
+
+.see-all {
+    color: var(--lux-accent);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* Collection card premium polish (combined into the main collection-card block below) */
+
+/* fine-tune card title moved/merged into the later .card-title block */
+
+/* Subtle overlay on card background for depth */
+.card-background::after {
+    display: none; /* remove overlay pseudo-element so there is no shading on top of the image */
+}
+
+/* Price pill redesigned to look like screenshot; final definition is later to avoid conflicting overrides */
+
+/* smaller footer price as subtle chip */
+.card-footer .price {
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+    border-radius: 12px;
+    padding: 6px 10px;
+    color: var(--lux-accent);
+    font-weight: 700;
+    box-shadow: 0 8px 22px rgba(29,107,80,0.06);
+    border: 1px solid rgba(205,162,79,0.06);
+}
+
+/* Ensure price chip doesn't conflict on very small screens */
+@media (max-width: 420px) {
+    .price-pill { padding: 8px 14px; bottom: 22px; }
+    .card-footer .price { padding: 5px 8px; font-size: 13px; }
 }
 
 @media (min-width: 769px) {
@@ -453,22 +551,52 @@ body {
     color: #2d8659;
 }
 
+/* Horizontal scrolling row for collections: show cards side-by-side and snap to start
+   Keep first card visible by making it sticky on the left edge while horizontally scrolling */
 .collections-row {
     display: flex;
-    gap: 20px;
+    flex-direction: row;
+    gap: 18px;
     overflow-x: auto;
-    padding-bottom: 8px;
-    padding-left: 8px;
-    padding-right: 8px;
-    -webkit-overflow-scrolling: touch;
+    overflow-y: hidden;
+    padding: 12px 16px 20px 16px;
     scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-left: 16px; /* keep some breathing room for snapped items */
 }
 
-@media (min-width: 769px) {
-    .collections-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 24px;
-    }
+.collections-row::-webkit-scrollbar { height: 8px; }
+.collections-row::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 4px; }
+
+.collections-row .collection-card { flex: 0 0 auto; scroll-snap-align: start; }
+
+/* Pin the very first card so it remains visible while the user scrolls horizontally */
+.collections-row .collection-card:first-child {
+    /* Unsticky: allow the first card to scroll normally with others.
+       Kept as a placeholder selector in case future per-card overrides are needed. */
+    position: static;
+    left: auto;
+    z-index: auto;
+}
+
+.collection-card {
+    position: relative;
+    border-radius: 24px;
+    overflow: visible;
+    transition: all 0.4s cubic-bezier(.2,.8,.2,1);
+    will-change: transform;
+    min-width: 320px;
+    width: 72vw;
+    max-width: 380px;
+    display: flex; /* so we can align footer */
+    flex-direction: column;
+    scroll-snap-align: start;
+    flex: 0 0 auto; /* prevent shrinking so horizontal scroll behaves consistently */
+    border: none; /* remove borders */
+    background: transparent !important; /* remove all backgrounds to keep only image */
+    box-shadow: none !important; /* remove shadow to keep image-only frame */
+    padding: 0; /* remove internal padding */
+}
 }
 
 @media (min-width: 1024px) {
@@ -484,12 +612,19 @@ body {
     border-radius: 24px;
     overflow: visible;
     transition: all 0.4s cubic-bezier(.2,.8,.2,1);
+    will-change: transform;
     min-width: 320px;
     width: 72vw;
     max-width: 380px;
     display: flex; /* so we can align footer */
     flex-direction: column;
-    scroll-snap-align: center;
+    scroll-snap-align: start;
+    flex: 0 0 auto; /* prevent shrinking so horizontal scroll behaves consistently */
+    border: none; /* remove outer borders */
+    background: transparent !important; /* keep only image */
+    box-shadow: none !important; /* no drop shadow */
+    position: relative; /* ensure absolute children still position relative to card */
+    padding: 0; /* remove internal padding so image is the only content */
 }
 
 .collection-card.small {
@@ -498,8 +633,11 @@ body {
 }
 
 .collection-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-12px) scale(1.01);
+    z-index: 5; /* ensure pop-out is above neighbors */
 }
+
+.collection-card::before { display: none; }
 
 .card-background {
     width: 100%;
@@ -511,32 +649,33 @@ body {
     margin-bottom: 12px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 28px rgba(6, 8, 17, 0.08);
+    background: transparent; /* keep only the image, no colored background */
     transition: all 0.3s ease;
 }
 
 .collection-card:hover .card-background {
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 20px 48px rgba(6, 8, 17, 0.16);
 }
 
 .card-background.poncho {
-    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+    background: transparent;
 }
 
-.card-background.waist {
-    background: linear-gradient(135deg, #f0d9f2 0%, #ead0e8 100%);
-}
+.card-background.waist { background: transparent; }
 
-.card-background.third { background: linear-gradient(135deg, #fbeefb 0%, #eed3f6 100%); }
-.card-background.rosy { background: linear-gradient(135deg, #fff2e6 0%, #ffd9e4 100%); }
-.card-background.light { background: linear-gradient(135deg, #fff9f0 0%, #fff2e6 100%); }
+.card-background.third { background: transparent; }
+.card-background.rosy { background: transparent; }
+.card-background.light { background: transparent; }
 
 .card-background img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    padding: 20px;
+    object-fit: contain; /* preserve whole image, no background shows */
+    padding: 8px 12px; /* small breathing room inside the frame */
     transition: transform 0.3s ease;
+    position: relative;
+    z-index: 0;
 }
 
 .collection-card:hover .card-background img {
@@ -548,6 +687,7 @@ body {
     display:flex;
     align-items:center;
     justify-content:space-between;
+    background: transparent; /* ensure no footer background */
 }
 
 .card-footer h4 {
@@ -565,7 +705,7 @@ body {
 
 .price {
     font-size: 14px;
-    color: #1a1a1a;
+    color: var(--lux-accent);
     font-weight: 600;
 }
 
@@ -586,6 +726,7 @@ body {
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 6px 20px rgba(45, 134, 89, 0.35);
     flex-shrink: 0;
+    will-change: transform;
 }
 
 /* Card title and favorite */
@@ -595,9 +736,15 @@ body {
     left: 18px;
     font-size: 28px;
     line-height: 1.02;
-    font-weight: 800;
+    font-weight: 400; /* changed to lighter weight */
     color: #1a1a1a;
     letter-spacing: -0.6px;
+    /* Remove pill styling so title sits on the image */
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    z-index: 6;
 }
 
 .fav-btn {
@@ -608,12 +755,12 @@ body {
     height: 36px;
     border-radius: 50%;
     border: none;
-    background: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.98);
     display:flex; align-items:center; justify-content:center;
     box-shadow: 0 6px 12px rgba(0,0,0,0.06);
 }
 
-.fav-btn svg { color: #ffffff; stroke: rgba(255,255,255,0.9); }
+.fav-btn svg { color: #8e8e8e; fill: none; stroke: #8e8e8e; }
 
 .fav-btn.active {
     background: linear-gradient(135deg, #ff6b9d, #ff8fab);
@@ -624,27 +771,47 @@ body {
 
 .price-pill {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 28px;
-    background: rgba(255,255,255,0.9);
-    padding: 12px 20px;
-    border-radius: 30px;
+    left: 18px; /* move to bottom-left */
+    transform: none;
+    bottom: 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,250,0.96));
+    padding: 10px 14px;
+    border-radius: 12px;
     display:flex; align-items:center; gap: 12px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    box-shadow: 0 8px 18px rgba(6, 8, 17, 0.06);
+    border: 1px solid rgba(205,162,79,0.06);
+}
+.price-pill .price-text {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--lux-accent); /* make the price visually distinct (e.g. NGN 75,000) */
 }
 
 .cart-small-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: none;
-    background: #1d6b50;
-    display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 6px 14px rgba(29,107,80,0.25);
+    width: auto;
+    height: auto;
+    border-radius: 10px;
+    border: 2px solid var(--lux-accent);
+    background: transparent;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    box-shadow: none;
+    position: static; /* flow inside the price-pill */
+    padding: 8px 10px;
 }
 
-.cart-small-btn svg { fill: #fff; width: 16px; height: 16px; }
+.cart-small-btn svg { fill: currentColor; width: 16px; height: 16px; }
+
+/* Add textual label to the add button on wider screens so it's more prominent */
+.cart-small-btn::after {
+    content: 'Add to cart';
+    font-size: 13px;
+    font-weight: 600;
+    display: none;
+}
+
+@media (min-width: 420px) {
+    .cart-small-btn::after { display: inline-block; }
+}
 
 .card-btn svg {
     width: 24px;
@@ -659,6 +826,21 @@ body {
 
 .card-btn:active {
     transform: scale(0.95);
+}
+
+/* Spring animation used for add-to-cart interactions */
+@keyframes springAnimation {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+/* Animation classes applied to cart buttons */
+.spring-anim {
+    animation: springAnimation 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.spring-anim-small {
+    animation: springAnimation 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Bottom Navigation */
@@ -677,6 +859,7 @@ body {
     z-index: 1000;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+   
     box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.14);
 }
 
@@ -721,6 +904,7 @@ body {
     opacity: 0.88;
     font-weight: 500;
     position: relative; /* allow the pill to overlap */
+    will-change: transform;
 }
 
 /* subtle click-fade overlay to give a premium 'fade-in' when a button is clicked */

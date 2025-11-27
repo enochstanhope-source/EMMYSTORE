@@ -75,11 +75,12 @@ const cartButtons = document.querySelectorAll('.card-btn');
 cartButtons.forEach(button => {
     button.addEventListener('click', function(e) {
         e.stopPropagation();
-        this.style.animation = 'none';
-        setTimeout(() => {
-            this.style.animation = 'springAnimation 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        }, 10);
-        console.log('Added to cart!');
+        // toggle animation class to run CSS-based spring animation
+        this.classList.remove('spring-anim');
+        // Force reflow to restart the animation
+        void this.offsetWidth;
+        this.classList.add('spring-anim');
+        // cart added - no-op in production
     });
 });
 
@@ -88,11 +89,11 @@ const cartSmallBtns = document.querySelectorAll('.cart-small-btn');
 cartSmallBtns.forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
-        this.style.animation = 'none';
-        setTimeout(() => {
-            this.style.animation = 'springAnimation 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        }, 10);
-        console.log('Small add to cart');
+        // toggle smaller spring animation class
+        this.classList.remove('spring-anim-small');
+        void this.offsetWidth;
+        this.classList.add('spring-anim-small');
+        // small add to cart - no-op in production
     });
 });
 
@@ -102,7 +103,7 @@ favButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
         this.classList.toggle('active');
-        console.log('Toggled favorite');
+        // toggled favorite - no-op in production
     });
 });
 
@@ -120,7 +121,7 @@ collectionCards.forEach(card => {
 const searchInput = document.querySelector('.search-input');
 if (searchInput) {
     searchInput.addEventListener('input', function(e) {
-        console.log('Searching for:', e.target.value);
+        // search input change - no-op in production
     });
     
     searchInput.addEventListener('focus', function() {
@@ -136,7 +137,7 @@ if (searchInput) {
 const buyNowBtn = document.querySelector('.buy-now-btn');
 if (buyNowBtn) {
     buyNowBtn.addEventListener('click', function() {
-        console.log('Buy now clicked!');
+        // buy now clicked - no-op in production
     });
 }
 
@@ -144,39 +145,13 @@ if (buyNowBtn) {
 const filterBtn = document.querySelector('.filter-btn');
 if (filterBtn) {
     filterBtn.addEventListener('click', function() {
-        console.log('Filter clicked!');
+        // filter clicked - no-op in production
     });
 }
 
-// Add spring animation keyframes dynamically
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes springAnimation {
-        0% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(0.9);
-        }
-        100% {
-            transform: scale(1);
-        }
-    }
-`;
-document.head.appendChild(style);
+// spring animation keyframes moved to CSS for better performance
 
-// Enhance scroll behavior
-const mainContent = document.querySelector('.main-content');
-if (mainContent) {
-    mainContent.addEventListener('scroll', function() {
-        // Add subtle effects on scroll if needed
-    });
-}
-
-// Responsive adjustments
-window.addEventListener('resize', function() {
-    // Handle responsive changes
-});
+// No scroll/resize listeners to keep runtime cost low
 
 // Initial setup
 document.addEventListener('DOMContentLoaded', function() {
@@ -192,6 +167,59 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    console.log('Fashion Store loaded successfully!');
+    // Fashion Store loaded
+    // Convert USD prices to NGN at a fixed rate (300 NGN per 1 USD)
+    const USD_TO_NGN = 300;
+    const ngnFormatter = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 });
+
+    function parseUsdFromString(text) {
+        if (!text) return null;
+        // remove commas and non-dot/digits (support decimals), then parse
+        const cleaned = text.replace(/,/g, '').replace(/[^(\d|\.)-]/g, '');
+        const matched = cleaned.match(/-?\d+(?:\.\d+)?/);
+        return matched ? parseFloat(matched[0]) : null;
+    }
+
+    function convertToNgn(usdAmount) {
+        if (typeof usdAmount !== 'number' || isNaN(usdAmount)) return null;
+        return Math.round(usdAmount * USD_TO_NGN);
+    }
+
+    function convertAllPrices(rate = USD_TO_NGN) {
+        const priceEls = document.querySelectorAll('.price-text, .price');
+        priceEls.forEach(el => {
+            // Preserve original USD if not already stored
+            if (!el.dataset.usd) {
+                const usd = parseUsdFromString(el.textContent || el.innerText);
+                if (usd === null) return; // skip if cannot parse
+                el.dataset.usd = usd;
+            }
+            const usdVal = parseFloat(el.dataset.usd);
+            if (isNaN(usdVal)) return;
+            const ngn = Math.round(usdVal * rate);
+            el.dataset.ngn = ngn;
+            // Format as NGN currency for display
+            el.textContent = ngnFormatter.format(ngn);
+        });
+    }
+
+    // Run conversion on load
+    convertAllPrices(USD_TO_NGN);
+
+    // Ensure the first collection card is visible on initial load (not sticky — all cards scroll naturally)
+    const collectionsRow = document.querySelector('.collections-row');
+    if (collectionsRow) {
+        // Set scroll to leftmost content — keep the first card visible
+        try {
+            collectionsRow.scrollTo({ left: 0, behavior: 'auto' });
+        } catch (e) {
+            // fallback for older browsers
+            collectionsRow.scrollLeft = 0;
+        }
+        const firstCard = collectionsRow.querySelector('.collection-card');
+        if (firstCard && firstCard.scrollIntoView) {
+            firstCard.scrollIntoView({ behavior: 'auto', inline: 'start', block: 'nearest' });
+        }
+    }
 });
 
