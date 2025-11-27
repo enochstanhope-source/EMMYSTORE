@@ -5,7 +5,8 @@
 }
 
 body {
-    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    /* Use Roboto as the primary UI font with Poppins as a fallback */
+    font-family: 'Roboto', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
     /* Luxury gradient background — deep, elegant tones with a soft vignette */
     --lux-1: #0b1220; /* deep navy/charcoal */
     --lux-2: #3a1f3d; /* plum */
@@ -479,46 +480,80 @@ body {
 
 /* Categories Section */
 .categories-section {
-    padding: 20px 16px 12px; /* reduce bottom padding to make section more compact */
+    padding: 12px 12px 8px; /* reduce padding for a thinner section */
     background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));
-    margin: 12px 12px 0 12px; /* float slightly above the container background */
-    border-radius: 14px;
+    margin: 8px 12px 0 12px; /* slightly less vertical space */
+    border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 12px 36px rgba(12,12,18,0.12);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28); /* stronger black shadow for visual separation */
+}
+
+/* Slight lift on hover for emphasis (desktop) */
+@media (hover: hover) and (pointer: fine) {
+    .categories-section:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 44px rgba(0,0,0,0.32);
+    }
+}
+
+/* Same lift & shadow behavior for collections section */
+@media (hover: hover) and (pointer: fine) {
+    .collections-section:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 44px rgba(0,0,0,0.32);
+        z-index: 2; /* lift above adjacent elements */
+    }
 }
 
 @media (min-width: 769px) {
     .categories-section {
-        padding: 28px 32px 16px; /* keep larger top/side padding on wide screens, but reduce bottom */
+        padding: 16px 20px 12px; /* smaller padding on wide screens to reduce height */
     }
 }
 
+@media (min-width: 1024px) {
+    .category-avatar { width: 54px; height: 54px; }
+    .category-btn { padding: 8px 12px; gap: 6px; }
+    .category-btn span { font-size: 13px; }
+}
+
 .categories-section h3 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: #1a1a1a;
-    margin-bottom: 16px;
+    margin-bottom: 10px; /* reduced spacing to reduce overall height */
 }
 
 @media (min-width: 769px) {
     .categories-section h3 {
-        font-size: 22px;
+        font-size: 18px;
     }
 }
 
 .categories-container {
     display: flex;
-    gap: 12px;
+    gap: 12px; /* smaller gap to reduce footprint */
     overflow-x: auto;
     overflow-y: hidden;
+    padding: 4px 10px 4px 12px; /* more compact vertical space */
     padding-bottom: 6px; /* slightly less, matches reduced section bottom padding */
     scroll-behavior: smooth;
     align-items: center;
+    scroll-snap-type: x mandatory; /* snap so buttons align when scrolling */
+    position: relative; /* required for ::after fade mask */
+    -webkit-overflow-scrolling: touch;
     /* Subtle accent border using the gold color to blend with the design */
     border-left: 4px solid rgba(205,162,79,0.06);
     padding-left: 12px; /* leave room for the border */
     /* gently lift on hover to emphasize interactivity */
     transition: box-shadow 220ms ease, transform 220ms ease;
+}
+
+@media (max-width: 420px) {
+    .category-avatar { width: 40px; height: 40px; }
+    .category-btn { padding: 6px 8px; gap: 6px; }
+    .category-btn span { font-size: 11px; }
+    .categories-section { padding: 10px 12px 6px; }
 }
 
 .categories-container::-webkit-scrollbar {
@@ -531,62 +566,108 @@ body {
 }
 
 .category-btn {
-    padding: 4px 10px; /* reduce button padding to fit better with smaller avatar */
+    padding: 6px 8px; /* compact clickable area */
     background: transparent;
     border: none;
-    border-radius: 22px;
-    font-size: 14px;
-    color: #666;
+    border-radius: 14px;
+    font-size: 13px;
+    color: #6b6b6b;
     cursor: pointer;
     white-space: nowrap;
-    display: flex;
+    display: inline-flex;
+    flex-direction: column; /* avatar above label */
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    font-weight: 500;
-    transition: all 0.3s cubic-bezier(.2,.8,.2,1);
+    gap: 6px; /* space between avatar and label */
+    font-weight: 600;
+    transition: transform 0.28s cubic-bezier(.2,.8,.2,1), box-shadow 0.28s ease, border-color 0.2s ease;
     flex-shrink: 0;
+    scroll-snap-align: start; /* snap each button to the display start */
 }
 
 .category-btn:first-child {
-    padding: 8px 20px; /* keep first 'All' button a bit larger but reduced */
+    padding: 6px 14px; /* keep first 'All' button slightly larger but compact */
 }
 
 .category-btn.active {
-    background: transparent;
-    color: #000;
-    font-weight: 700;
-    border: 1.5px solid var(--lux-accent);
-    box-shadow: none;
+    background: linear-gradient(180deg, rgba(205,162,79,0.12), rgba(205,162,79,0.02));
+    color: #111;
+    font-weight: 800;
+    border: 1px solid rgba(205,162,79,0.14);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 34px rgba(6, 8, 17, 0.12);
 }
-.category-btn.active {
-    background: linear-gradient(180deg, rgba(205,162,79,0.06), rgba(205,162,79,0.02));
-}
+
+.category-btn.active span { color: #111; }
+
+/* support accessible pressed state - if JS toggles aria-pressed */
+.category-btn[aria-pressed="true"] { box-shadow: 0 12px 34px rgba(6, 8, 17, 0.12); transform: translateY(-4px) scale(1.02); }
+
+.category-btn img { display: block; width: 100%; height: 100%; border-radius: inherit; }
 
 .category-avatar {
-    width: 40px; /* slightly smaller avatar to match reduced spacing */
-    height: 40px;
+    width: 44px; /* slightly smaller for compact layout */
+    height: 44px;
     border-radius: 50%;
     overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.96);
-    box-shadow: 0 10px 26px rgba(10, 14, 22, 0.08);
+    background: #ffffff; /* white circle backdrop */
+    padding: 3px; /* small inset so image doesn't touch the edges */
+    box-shadow: 0 8px 20px rgba(6, 8, 17, 0.07);
     border: 2px solid rgba(205,162,79,0.08); /* subtle accent ring */
 }
 
 /* Slight subtle hover on the active item to indicate it's interactive */
-.category-btn.active:hover { background: rgba(0,0,0,0.02); transform: none; }
+.category-btn.active:hover { background: linear-gradient(180deg, rgba(205,162,79,0.12), rgba(205,162,79,0.03)); transform: translateY(-4px) scale(1.02); }
 
 .category-btn:hover:not(.active) {
-    background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.9));
-    transform: translateY(-2px);
-    box-shadow: 0 8px 26px rgba(8,8,8,0.06);
+    background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.92));
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(6, 8, 17, 0.06);
 }
 
-.category-btn:hover:not(.active) .category-avatar {
-    border-color: var(--lux-accent);
+ .category-btn:hover:not(.active) .category-avatar {
+    border-color: rgba(205,162,79,0.2);
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* --- Accessibility & Focus --- */
+.category-btn:focus-visible {
+    outline: 3px solid rgba(205,162,79,0.18);
+    outline-offset: 2px;
+    border-radius: 12px;
+}
+
+/* Make the category label visually distinct under each avatar */
+.category-btn span {
+    display: block;
+    font-size: 12px;
+    color: #5e5e5e;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    text-align: center;
+}
+
+/* Distinct 'All' avatar with gold gradient */
+.category-all .all-avatar {
+    background: linear-gradient(180deg, #fef7ec, #fff6e6);
+    border: 2px solid rgba(205,162,79,0.20);
+    box-shadow: 0 6px 18px rgba(205,162,79,0.04);
+}
+.category-all .all-text { color: #4b4b4b; font-size: 13px; font-weight: 300; }
+
+/* A subtle fading mask at the right to encourage horizontal scrolling */
+.categories-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 38px;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.94));
 }
 
 .category-btn:active {
@@ -601,10 +682,10 @@ body {
 
 /* removed duplicate category-avatar block: the avatar style is defined earlier with an accent ring */
 
-.category-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.category-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
-.category-all .all-avatar { background: #fff; display:flex; align-items:center; justify-content:center; }
-.category-all .all-text { font-weight:700; color:#333; padding: 4px 8px; }
+.category-all .all-avatar { display:flex; align-items:center; justify-content:center; }
+.category-all .all-text { font-weight:300; color:#333; padding: 4px 8px; font-size:13px; }
 
 /* Collections Section */
 .collections-section {
@@ -613,14 +694,15 @@ body {
     margin: 12px 12px 24px 12px;
     border-radius: 14px;
     border: 1px solid rgba(255,255,255,0.06);
-    box-shadow: 0 12px 36px rgba(18,16,28,0.10);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.28); /* replace with stronger black shadow */
 }
 
 /* Premium enhancements for collection cards and price tags */
 .collections-section {
     /* subtle inner glow, slightly stronger border for premium look */
     border: 1px solid rgba(205,162,79,0.06);
-    box-shadow: 0 12px 36px rgba(18,16,28,0.10), inset 0 2px 12px rgba(255,255,255,0.03);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.28), inset 0 2px 12px rgba(255,255,255,0.03);
+    will-change: transform; /* hint for hover transform */
 }
 
 .section-header h3 {
@@ -931,11 +1013,11 @@ body {
 .card-footer { padding: 8px 12px; display:flex; flex-direction: column; gap: 8px; align-items: flex-start; background: transparent; }
 .product-desc { color: #666; font-size: 13px; line-height: 1.3; max-width: 92%; }
 /* Always show Add to cart text */
-.add-label { display: inline-block !important; color: #f3f3f3 !important; font-weight: 600; }
+.add-label { display: inline-block !important; color: #f3f3f3 !important; font-weight: 200;font-family: Arial, roboto; }
 .product-meta { display:flex; align-items:center; gap: 12px; }
 .rating { display:flex; align-items:center; gap: 6px; color: var(--lux-accent); font-weight: 700; }
 .rating .stars { color: var(--lux-accent); font-size: 14px; line-height: 1; }
-.rating .rating-value { color: #333; font-weight: 700; font-size: 13px; }
+.rating .rating-value { color: #c5a5a5; font-weight: 700; font-size: 13px; }
 .rating .reviews-count { color: #999; font-size: 12px; }
 .badge { font-size: 12px; background: rgba(205,162,79,0.12); color: var(--lux-accent); padding: 4px 8px; border-radius: 10px; font-weight: 700; }
 

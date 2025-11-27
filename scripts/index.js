@@ -1,9 +1,12 @@
 // Category button functionality
 const categoryButtons = document.querySelectorAll('.category-btn');
 categoryButtons.forEach(button => {
+    // Set default aria-pressed for accessibility
+    button.setAttribute('aria-pressed', button.classList.contains('active') ? 'true' : 'false');
     button.addEventListener('click', function() {
-        categoryButtons.forEach(btn => btn.classList.remove('active'));
+        categoryButtons.forEach(btn => { btn.classList.remove('active'); btn.setAttribute('aria-pressed', 'false'); });
         this.classList.add('active');
+        this.setAttribute('aria-pressed', 'true');
     });
 });
 
