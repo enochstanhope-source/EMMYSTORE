@@ -224,13 +224,23 @@ if (hamburgerBtn) {
         hamburgerBtn.classList.add('open');
         hamburgerBtn.setAttribute('aria-expanded', 'true');
         if (menu) {
+            // Make the element visible first so the transform/opacity transition can run.
+            // Remove the hidden flag and mark aria-hidden=false, force a reflow, then add the
+            // 'open' class to trigger the CSS transition. This avoids the jump caused when
+            // adding classes while the element is display:none.
+            try { menu.hidden = false; } catch (err) {}
+            try { menu.setAttribute('aria-hidden', 'false'); } catch (err) {}
+            // Force layout so that the subsequent class addition will animate
+            // eslint-disable-next-line no-unused-expressions
+            menu.offsetWidth;
             menu.classList.add('open');
-            menu.setAttribute('aria-hidden', 'false');
-            // ensure element is not hidden (so screen readers find it)
-            menu.hidden = false;
-            // focus the first link for keyboard users
+            // focus the first link for keyboard users without causing page scroll
             const first = menu.querySelector('.menu-link');
-            if (first) first.focus();
+            try {
+                if (first && first.focus) first.focus({ preventScroll: true });
+            } catch (err) {
+                if (first && first.focus) first.focus();
+            }
         }
         backdrop.classList.add('visible');
     }
@@ -239,10 +249,24 @@ if (hamburgerBtn) {
         hamburgerBtn.classList.remove('open');
         hamburgerBtn.setAttribute('aria-expanded', 'false');
         if (menu) {
+            // Start closing animation by removing the open class, then set aria-hidden/hidden
+            // after the transition completes so the slide-out animation remains smooth.
             menu.classList.remove('open');
-            menu.setAttribute('aria-hidden', 'true');
-            // mark as hidden for browsers / screen readers
-            menu.hidden = true;
+            // Listen for transitionend on transform/opacity so we hide only after animation completes.
+            const onTransitionEnd = (e) => {
+                if (e && e.propertyName && !/transform|opacity/.test(e.propertyName)) return;
+                try { menu.setAttribute('aria-hidden', 'true'); } catch (err) {}
+                try { menu.hidden = true; } catch (err) {}
+                menu.removeEventListener('transitionend', onTransitionEnd);
+                clearTimeout(fallback);
+            };
+            menu.addEventListener('transitionend', onTransitionEnd);
+            // Fallback in case transitionend doesn't fire (reduced-motion or other reasons)
+                const fallback = setTimeout(() => {
+                    try { menu.setAttribute('aria-hidden', 'true'); } catch (err) {}
+                    try { menu.hidden = true; } catch (err) {}
+                    menu.removeEventListener('transitionend', onTransitionEnd);
+                }, 640);
         }
         backdrop.classList.remove('visible');
     }

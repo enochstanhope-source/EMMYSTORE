@@ -4,6 +4,11 @@
     box-sizing: border-box;
 }
 
+/* Keep the scrollbar gutter reserved to avoid layout shift when overlays open */
+html {
+    scrollbar-gutter: stable;
+}
+
 body {
     /* Use Roboto as the primary UI font with Poppins as a fallback */
     font-family: 'Roboto', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
@@ -24,6 +29,8 @@ body {
 
 :root {
     --nav-height: 90px; /* base nav height which we can use for safe-area adjustments */
+    --header-accent: #b6872c; /* brand gold for headers and accents */
+    --hamburger-offset: 0px; /* default offset for hamburger (can be overridden per breakpoint) */
 }
 
 .container {
@@ -70,19 +77,35 @@ body {
 }
 
 /* Header */
+/* Keep header visible at the top so controls (notif/hamburger) stay in place */
 .header {
     /* glass header to match luxury background */
     background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.92));
-    padding: 16px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 18px 20px; /* slightly taller to make room for border */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.411); /* prominent brand accent */
         color: #1a1a1a;
         font-weight: 800;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: sticky; /* keep header fixed at the top */
+    top: 0;
+    z-index: 1400; /* above the menu so header stays visually steady */
+    will-change: transform; /* hint to avoid jank when menu animates underneath */
+    /* create a new compositing layer to reduce repaints/jank */
+    transform: translateZ(0);
 }
 
 @media (min-width: 769px) {
     .header {
         padding: 20px 32px;
+        border-bottom-width: 1px; /* keep border thickness on larger screens */
+        /* make the header a single-row layout on larger screens so icons and logo align */
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
     }
+    .search-container { padding-top: 0; }
 }
 
 .status-bar {
@@ -118,13 +141,105 @@ body {
     display: flex;
     gap: 12px;
     align-items: center;
+    justify-content: space-between;
     padding-top: 40px; /* added padding as requested */
+    width: 100%;
 }
+
+/* `.left-group` removed — logo is now a top-level header child */
 .search-wrapper {
     flex: 1;
     position: relative;
     display: flex;
     align-items: center;
+}
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            text-decoration: none;
+            /* apply same offset as hamburger so logo moves in sync across breakpoints */
+            transform: translateY(var(--hamburger-offset, 0px));
+            padding: 0.35rem 0.85rem;
+            border-radius: 2rem;
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92));
+            border: 1px solid rgba(182,135,44,0.08); /* subtle gold border */
+            box-shadow: 0 6px 20px rgba(182,135,44,0.06);
+            transition: box-shadow 0.18s ease, transform 180ms ease;
+            color: #b6872c; /* brand gold used as base text color */
+        }
+        .logo:hover, .logo:focus {
+            /* keep the logo vertically aligned with the hamburger by using the same offset variable */
+            transform: translateY(calc(var(--hamburger-offset, 0px) - 2px));
+            box-shadow: 0 12px 38px rgba(182,135,44,0.12);
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.94));
+        }
+        .logo-emblem {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Gold and purple mix for a modern, premium look */
+            background: linear-gradient(135deg, #b6872c 0%, #ffd07c 50%, #6c47ff 100%);
+            border-radius: 50%;
+            padding: 0.28rem;
+            box-shadow: 0 6px 20px rgba(182,135,44,0.08);
+        }
+        .logo-emblem svg {
+            display: block;
+            width: 38px;
+            height: 38px;
+            stroke: #ffffff; /* use white for the emblem SVG to contrast the gradient */
+            color: #ffffff; /* ensures stroke='currentColor' uses white on the emblem */
+        }
+.logo-text {
+            font-family: 'Poppins', 'Roboto', Arial, sans-serif;
+            font-weight: 700;
+            font-size: 1.45rem;
+            letter-spacing: 0.04em;
+            color: #b6872c; /* brand gold */
+            text-shadow: 0 1px 6px rgba(182,135,44,0.10);
+        }
+.logo svg { color: inherit; width:34px; height:34px; }
+/* ensure the emblem svg uses a white stroke regardless of inherited svg color */
+.logo-emblem svg { color: #ffffff; stroke: #ffffff; }
+.logo-text { font-size: 16px; display:inline-block; letter-spacing: 0.04em; text-transform:uppercase; font-family: 'Poppins', sans-serif; color: #b6872c; }
+/* small size tweak when the header is compact */
+@media (min-width: 769px) {
+    .logo-text { font-size: 18px; }
+}
+
+.icons-right { display:flex; gap:8px; align-items:center; }
+.icons-right { margin-left: 12px; }
+
+/* keep the icons aligned at the top-right of the header on small screens */
+@media (max-width: 768px) {
+    .header { position: relative; }
+    .icons-right { position: absolute; right: 12px; top: 14px; margin-left: 0; }
+    /* move hamburger slightly down on mobile so notif badge sits nearer the top */
+    :root { --hamburger-offset: 36px; }
+}
+
+.notif-btn { position: relative; width:44px; height:44px; border-radius:50%; border:none; background:#f5f5f5; display:flex; align-items:center; justify-content:center; cursor:pointer; transition: transform 0.18s ease, background 0.18s ease; transform: translateY(var(--hamburger-offset, 0px)); }
+.notif-btn svg { width:20px; height:20px; color:#666; }
+.notif-btn:hover { transform: translateY(var(--hamburger-offset, 0px)) scale(1.03); background:#efefef; }
+.notif-btn:hover svg, .notif-btn:focus-visible svg { color: rgba(205,162,79,0.95); }
+.notif-btn:active { transform: translateY(var(--hamburger-offset, 0px)) scale(0.96); }
+.notif-badge { position:absolute; top:6px; right:6px; background:#e63946; color:#fff; font-size:11px; padding:0 6px; height:18px; line-height:18px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 8px rgba(0,0,0,0.12); }
+/* keyboard focus styles for notification */
+.notif-btn:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 12px; transform: translateY(calc(var(--hamburger-offset, 0px) - 1px)); }
+.logo:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 8px; transform: translateY(calc(var(--hamburger-offset, 0px) - 2px)); }
+
+@media (max-width: 420px) {
+    /* Keep the logo text visible on narrow screens, scale it down to fit */
+    .logo-text { display: inline-block; font-size: 13px; max-width: 120px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .logo svg { width:28px; height:28px; }
+    .search-wrapper { min-width: 80px; }
+}
+
+/* Reserve horizontal space in the search input on small screens so the absolute icons don't overlap */
+@media (max-width: 768px) {
+    .search-input { padding-right: 110px; }
 }
 
 .search-icon {
@@ -207,10 +322,14 @@ body {
     justify-content: center;
     transition: background 0.25s ease, transform 0.18s ease;
     flex-shrink: 0;
+    /* apply the vertical offset variable so the button can be nudged without altering layout */
+    transform: translateY(var(--hamburger-offset, 0px));
 }
 .hamburger-btn svg { width: 20px; height: 20px; color: #666; }
-.hamburger-btn:hover { background: #efefef; transform: scale(1.03); }
-.hamburger-btn:active { transform: scale(0.96); }
+.hamburger-btn:hover { background: #efefef; transform: translateY(var(--hamburger-offset, 0px)) scale(1.03); }
+.hamburger-btn:active { transform: translateY(var(--hamburger-offset, 0px)) scale(0.96); }
+/* keyboard focus should match hover lift to keep interactions consistent */
+.hamburger-btn:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 12px; transform: translateY(calc(var(--hamburger-offset, 0px) - 1px)); }
 
 /* animate the three lines into an X when open */
 .hamburger-btn .line {
@@ -233,26 +352,33 @@ body {
     .hamburger-btn .line { transition: none; }
 }
 
-/* Off-canvas main menu */
 .main-menu {
+    /* Right-docked off-canvas navigation panel */
     position: fixed;
     top: var(--header-height, 72px);
-    left: 0;
+    right: 0; /* anchor to the right edge */
+    left: auto; /* explicitly clear left position so it doesn't conflict */
     height: calc(100vh - var(--header-height, 72px));
     width: 280px;
     max-width: 85vw;
     background: linear-gradient(180deg, #ffffff, #fafafa);
-    box-shadow: 6px 0 40px rgba(6,8,17,0.18);
-    transform: translateX(-100%); /* start off left */
-    transition: transform 320ms cubic-bezier(.2,.9,.2,1);
+    /* create shadow towards the left since the panel sits on the right */
+    box-shadow: -6px 0 40px rgba(6,8,17,0.18);
+    /* start hidden off the right edge */
+    transform: translateX(100%);
+    opacity: 0;
+    transform-origin: right center;
+    /* slower, smoother slide + fade for a more graceful entrance */
+    transition: transform 520ms cubic-bezier(.16,.84,.24,1), opacity 360ms ease;
     z-index: 1200;
     padding: 18px 12px 24px 12px; /* internal padding; top padding accounted by top var */
     -webkit-overflow-scrolling: touch;
-    border-radius: 0 12px 12px 0; /* round trailing edge */
+    border-radius: 12px 0 0 12px; /* round left/trailing edge */
     will-change: transform;
 }
 .main-menu.open {
-    transform: translateX(0);
+    transform: translateX(0) !important; /* slide into view */
+    opacity: 1 !important;
 }
 .main-menu[aria-hidden="true"] { visibility: hidden; pointer-events: none; }
 .main-menu[aria-hidden="false"] { visibility: visible; pointer-events: auto; }
@@ -304,11 +430,20 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
-.menu-link:hover, .menu-link:focus { background: rgba(0,0,0,0.04); transform: translateX(4px); outline: none; }
+.menu-link:hover, .menu-link:focus { background: rgba(0,0,0,0.04); transform: translateX(-4px); outline: none; }
 
 /* Dismiss overlay backdrop when menu open (semi-transparent) */
 .menu-backdrop {
-    position: fixed; left: 0; right: 0; top: var(--header-height, 72px); height: calc(100vh - var(--header-height, 72px)); background: rgba(0,0,0,0.36); z-index: 1100; opacity: 0; pointer-events: none; transition: opacity 220ms ease;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--header-height, 72px);
+    height: calc(100vh - var(--header-height, 72px));
+    background: rgba(0,0,0,0.36);
+    z-index: 1100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 320ms ease;
 }
 .menu-backdrop.visible { opacity: 1; pointer-events: auto; }
 
@@ -513,7 +648,7 @@ body {
 }
 
 @media (min-width: 1024px) {
-    .category-avatar { width: 54px; height: 54px; }
+    .category-avatar { width: 48px; height: 48px; }
     .category-btn { padding: 8px 12px; gap: 6px; }
     .category-btn span { font-size: 13px; }
 }
@@ -553,7 +688,7 @@ body {
 }
 
 @media (max-width: 420px) {
-    .category-avatar { width: 40px; height: 40px; }
+    .category-avatar { width: 36px; height: 36px; }
     .category-btn { padding: 6px 8px; gap: 6px; }
     .category-btn span { font-size: 11px; }
     .categories-section { padding: 10px 12px 6px; }
@@ -609,7 +744,7 @@ body {
 .category-btn.category-all.active {
     background: linear-gradient(180deg, rgba(199, 138, 16, 0.527), rgba(205,162,79,0.04));
     /* Make the border solid and visible around the entire button */
-    border: 2px solid rgba(205,162,79,0.95);
+        border: 1px solid rgba(205,162,79,0.85);
     border-style: solid;
     /* Keep the background clipped to padding so the border isn't visually broken */
     background-clip: padding-box;
@@ -625,17 +760,17 @@ body {
 .category-btn img { display: block; width: 100%; height: 100%; border-radius: inherit; }
 
 .category-avatar {
-    width: 49px; /* slightly smaller for compact layout */
-    height: 49px;
+    width: 44px; /* slightly smaller for compact layout */
+    height: 44px;
     border-radius: 50%;
     overflow: hidden;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: #ffffff; /* white circle backdrop */
-    padding: 5px; /* small inset so image doesn't touch the edges; increased for more pronounced ring */
-    box-shadow: 0 8px 20px rgba(6, 8, 17, 0.07);
-    border: 1px solid rgba(205,162,79,0.08); /* reduced thin accent ring */
+    padding: 4px; /* small inset so image sits neatly inside a smaller ring */
+    box-shadow: 0 6px 12px rgba(6, 8, 17, 0.05);
+    border: 0.8px solid rgba(205,162,79,0.06); /* tinier border to be less obtrusive */
     transition: transform 220ms cubic-bezier(.2,.9,.2,1), border-color 220ms ease, box-shadow 220ms ease;
 }
 
@@ -663,10 +798,11 @@ body {
 /* Make the category label visually distinct under each avatar */
 .category-btn span {
     display: block;
+    font-family: 'Roboto', 'Poppins', sans-serif; /* professional Roboto font */
     font-size: 12px;
-    color: #5e5e5e;
+    color: #1a1a1a; /* darker color for professional look */
     font-weight: 600;
-    letter-spacing: 0.1px;
+    letter-spacing: 0.02em;
     text-align: center;
 }
 
@@ -674,10 +810,10 @@ body {
 .category-all .all-avatar {
     background: linear-gradient(180deg, #c7b9b9, #010408);
     /* Ensure the avatar ring is a solid accent color and matches the outer border */
-    border: 2px solid rgba(205,162,79,0.95);
-    box-shadow: 0 6px 18px rgba(8, 6, 2, 0.925);
+    border: 0.9px solid rgba(205,162,79,0.85); /* slightly thinner ring */
+    box-shadow: 0 6px 14px rgba(8, 6, 2, 0.24);
 }
-.category-all .all-text { color: #fff; font-size: 13px; font-weight: 300; }
+.category-all .all-text { color: #fff; font-size: 13px; font-weight: 500; font-family: 'Roboto', 'Poppins', sans-serif; }
 
 /* A subtle fading mask at the right to encourage horizontal scrolling */
 .categories-container::after {
@@ -722,6 +858,7 @@ body {
     box-shadow: 0 6px 14px rgb(0, 0, 0);
 }
 .category-btn.category-man.active { background: linear-gradient(180deg, rgba(31,143,255,0.08), rgba(31,143,255,0.02)); color: #063f83; border: 1px solid rgba(31,143,255,0.14); }
+.category-btn.category-man.active { background: linear-gradient(180deg, rgba(31,143,255,0.08), rgba(31,143,255,0.02)); color: #063f83; border: 1px solid rgba(31,143,255,0.14); }
 .category-btn.category-man:hover:not(.active) .category-avatar { transform: translateY(-3px) scale(1.03); border-color: rgba(31,143,255,0.18); }
 
 .category-btn.category-woman .category-avatar {
@@ -744,9 +881,9 @@ body {
 .category-btn.category-man.active .category-avatar,
 .category-btn.category-woman.active .category-avatar,
 .category-btn.category-kids.active .category-avatar {
-    transform: translateY(-4px) scale(1.06);
-    box-shadow: 0 14px 40px rgb(202, 80, 10);
-    border-width: 2px;
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+    border-width: 1px; /* reduced for a more modern subtle look */
 }
 
 /* Set a neutral transparent avatar background for any categories that don't provide images */
