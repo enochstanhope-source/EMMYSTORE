@@ -20,7 +20,7 @@ body {
     --card-shadow: 0 18px 60px rgba(8, 10, 20, 0.5);
     background: radial-gradient(1200px 600px at 8% 12%, rgba(205,162,79,0.06), transparent 12%),
                 linear-gradient(135deg, var(--lux-1) 0%, var(--lux-2) 70%);
-    color: #f4f4f4;
+    color: var(--text-color);
     overflow: hidden;
     -webkit-text-size-adjust: 100%; /* prevent mobile browser text auto-scaling */
     -ms-text-size-adjust: 100%;
@@ -31,6 +31,10 @@ body {
     --nav-height: 90px; /* base nav height which we can use for safe-area adjustments */
     --header-accent: #b6872c; /* brand gold for headers and accents */
     --hamburger-offset: 0px; /* default offset for hamburger (can be overridden per breakpoint) */
+    --logo-nudge: 16px; /* how much the logo is lifted above the hamburger offset */
+    /* UI color variables */
+    --text-color: #000000; /* main text color (black) */
+    --active-bg: #cec8c8; /* yellow hover/active background */
 }
 
 .container {
@@ -159,21 +163,22 @@ body {
             align-items: center;
             gap: 0.7rem;
             text-decoration: none;
-            /* apply same offset as hamburger so logo moves in sync across breakpoints */
-            transform: translateY(var(--hamburger-offset, 0px));
+                /* apply same offset as hamburger so logo moves in sync across breakpoints,
+                    then nudge logo up slightly for a better visual alignment */
+                transform: translateY(calc(var(--hamburger-offset, 0px) - var(--logo-nudge)));
             padding: 0.35rem 0.85rem;
             border-radius: 2rem;
             background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92));
             border: 1px solid rgba(182,135,44,0.08); /* subtle gold border */
             box-shadow: 0 6px 20px rgba(182,135,44,0.06);
             transition: box-shadow 0.18s ease, transform 180ms ease;
-            color: #b6872c; /* brand gold used as base text color */
+            color: var(--text-color); /* main text color */
         }
         .logo:hover, .logo:focus {
             /* keep the logo vertically aligned with the hamburger by using the same offset variable */
-            transform: translateY(calc(var(--hamburger-offset, 0px) - 2px));
+            transform: translateY(calc(var(--hamburger-offset, 0px) - calc(var(--logo-nudge) + 2px)));
             box-shadow: 0 12px 38px rgba(182,135,44,0.12);
-            background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.94));
+            background: var(--active-bg);
         }
         .logo-emblem {
             display: flex;
@@ -203,7 +208,7 @@ body {
 .logo svg { color: inherit; width:34px; height:34px; }
 /* ensure the emblem svg uses a white stroke regardless of inherited svg color */
 .logo-emblem svg { color: #ffffff; stroke: #ffffff; }
-.logo-text { font-size: 16px; display:inline-block; letter-spacing: 0.04em; text-transform:uppercase; font-family: 'Poppins', sans-serif; color: #b6872c; }
+.logo-text { font-size: 16px; display:inline-block; letter-spacing: 0.04em; text-transform:uppercase; font-family: 'Poppins', sans-serif; color: var(--text-color); }
 /* small size tweak when the header is compact */
 @media (min-width: 769px) {
     .logo-text { font-size: 18px; }
@@ -222,13 +227,13 @@ body {
 
 .notif-btn { position: relative; width:44px; height:44px; border-radius:50%; border:none; background:#f5f5f5; display:flex; align-items:center; justify-content:center; cursor:pointer; transition: transform 0.18s ease, background 0.18s ease; transform: translateY(var(--hamburger-offset, 0px)); }
 .notif-btn svg { width:20px; height:20px; color:#666; }
-.notif-btn:hover { transform: translateY(var(--hamburger-offset, 0px)) scale(1.03); background:#efefef; }
+.notif-btn:hover { transform: translateY(var(--hamburger-offset, 0px)) scale(1.03); background: var(--active-bg); }
 .notif-btn:hover svg, .notif-btn:focus-visible svg { color: rgba(205,162,79,0.95); }
 .notif-btn:active { transform: translateY(var(--hamburger-offset, 0px)) scale(0.96); }
 .notif-badge { position:absolute; top:6px; right:6px; background:#e63946; color:#fff; font-size:11px; padding:0 6px; height:18px; line-height:18px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 8px rgba(0,0,0,0.12); }
 /* keyboard focus styles for notification */
 .notif-btn:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 12px; transform: translateY(calc(var(--hamburger-offset, 0px) - 1px)); }
-.logo:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 8px; transform: translateY(calc(var(--hamburger-offset, 0px) - 2px)); }
+.logo:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 8px; transform: translateY(calc(var(--hamburger-offset, 0px) - calc(var(--logo-nudge) + 2px))); }
 
 @media (max-width: 420px) {
     /* Keep the logo text visible on narrow screens, scale it down to fit */
@@ -301,7 +306,7 @@ body {
 }
 
 .filter-btn:hover {
-    background: #efefef;
+    background: var(--active-bg);
     transform: scale(1.05);
 }
 
@@ -326,7 +331,7 @@ body {
     transform: translateY(var(--hamburger-offset, 0px));
 }
 .hamburger-btn svg { width: 20px; height: 20px; color: #666; }
-.hamburger-btn:hover { background: #efefef; transform: translateY(var(--hamburger-offset, 0px)) scale(1.03); }
+.hamburger-btn:hover { background: var(--active-bg); transform: translateY(var(--hamburger-offset, 0px)) scale(1.03); }
 .hamburger-btn:active { transform: translateY(var(--hamburger-offset, 0px)) scale(0.96); }
 /* keyboard focus should match hover lift to keep interactions consistent */
 .hamburger-btn:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 12px; transform: translateY(calc(var(--hamburger-offset, 0px) - 1px)); }
@@ -361,9 +366,13 @@ body {
     height: calc(100vh - var(--header-height, 72px));
     width: 280px;
     max-width: 85vw;
-    background: linear-gradient(180deg, #ffffff, #fafafa);
-    /* create shadow towards the left since the panel sits on the right */
-    box-shadow: -6px 0 40px rgba(6,8,17,0.18);
+    /* Premium white gradient with a subtle gold accent on the leading edge */
+    background-color: #ffffff; /* fallback */
+    background: linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(250,250,250,0.96) 100%);
+    border-left: 1px solid rgba(182,135,44,0.08); /* subtle gold border */
+    /* slight overlay to add a soft inner fade and vignette for a smoother entrance */
+    background-blend-mode: normal;
+    box-shadow: 0 18px 50px rgba(6,8,17,0.08); /* gentle floating shadow */
     /* start hidden off the right edge */
     transform: translateX(100%);
     opacity: 0;
@@ -373,19 +382,40 @@ body {
     z-index: 1200;
     padding: 18px 12px 24px 12px; /* internal padding; top padding accounted by top var */
     -webkit-overflow-scrolling: touch;
-    border-radius: 12px 0 0 12px; /* round left/trailing edge */
+    border-radius: 12px 0 0 12px; /* rounded left edge */
+    overflow: hidden; /* clip children to rounded corner */
     will-change: transform;
+}
+.main-menu::after {
+    /* soft fade overlay to create a gentle darkening on the right edge and a subtle inner vignette */
+    content: "";
+    position: absolute;
+    inset: 0; /* top/right/bottom/left = 0 */
+    pointer-events: none; /* don't interfere with clicks */
+    border-radius: 12px 0 0 12px;
+    /* overlay uses a dark plum/charcoal with subtle transparency — no pure black */
+    background: linear-gradient(90deg, rgba(11,18,32,0) 0%, rgba(11,18,32,0.06) 35%, rgba(11,18,32,0.16) 70%, rgba(11,18,32,0.28) 100%);
+    mix-blend-mode: multiply;
+    opacity: 0; /* start hidden, fade in when menu opens */
+    transition: opacity 360ms ease; /* match entrance timing */
 }
 .main-menu.open {
     transform: translateX(0) !important; /* slide into view */
     opacity: 1 !important;
 }
+.main-menu.open::after { opacity: 0.98; }
+
+/* Ensure text inside the menu is readable on the gradient */
+.main-menu .menu-link { color: var(--text-color); }
+.main-menu .menu-link .cart-badge { background: linear-gradient(180deg, #b6872c, #ffd07c); color: #fff; box-shadow: 0 6px 12px rgba(182,135,44,0.14); }
 .main-menu[aria-hidden="true"] { visibility: hidden; pointer-events: none; }
 .main-menu[aria-hidden="false"] { visibility: visible; pointer-events: auto; }
 
-.menu-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.menu-list { list-style: none; display: flex; flex-direction: column; gap: 12px; padding: 6px 8px; }
 .menu-link {
-    display: block;
+    display: flex; /* make links act like buttons */
+    align-items: center;
+    gap: 12px;
     padding: 12px 14px;
     border-radius: 12px;
     color: #121212;
@@ -393,7 +423,15 @@ body {
     font-weight: 700;
     font-size: 16px;
     background: transparent;
-    transition: background 180ms ease, transform 120ms ease;
+    transition: background 220ms ease, transform 180ms ease, box-shadow 220ms ease;
+}
+
+.menu-link .menu-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 10px;
+    display: inline-block;
 }
 
 /* Small badge shown beside the Cart link to indicate number of items in cart */
@@ -406,9 +444,42 @@ body {
     line-height: 18px;
     color: #fff;
     text-align: center;
-    background: #e63946;
+    background: linear-gradient(180deg, #b6872c, #ffd07c);
     border-radius: 999px;
     margin-left: 8px;
+}
+
+.main-menu .menu-link:hover, .main-menu .menu-link:focus {
+    /* golden hover — subtle lift and light gold tint */
+    background: linear-gradient(90deg, rgba(205,162,79,0.12), rgba(255,255,255,0.96));
+    transform: translateX(-6px);
+    box-shadow: 0 8px 24px rgba(182,135,44,0.06);
+    outline: none;
+    color: #0f0f0f;
+}
+
+.main-menu .menu-link:focus-visible {
+    outline: 3px solid rgba(205,162,79,0.14);
+    box-shadow: 0 8px 28px rgba(205,162,79,0.08);
+}
+
+.main-menu .menu-link .menu-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; padding: 6px; border-radius: 10px;
+    background: linear-gradient(180deg, rgba(205,162,79,0.06), rgba(255,255,255,0.96));
+    box-shadow: 0 6px 16px rgba(6,8,17,0.04);
+    transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.main-menu .menu-link:hover .menu-icon, .main-menu .menu-link:focus .menu-icon {
+    background: linear-gradient(180deg, #b6872c, #ffd07c);
+    transform: scale(1.04);
+    box-shadow: 0 10px 22px rgba(182,135,44,0.12);
+}
+
+.main-menu .menu-link.active, .main-menu .menu-link[aria-current="page"] {
+    background: linear-gradient(180deg, rgba(205,162,79,0.12), rgba(255,255,255,0.96));
+    box-shadow: 0 12px 28px rgba(182,135,44,0.06);
 }
 
 /* Simple toast for add-to-cart feedback */
@@ -430,22 +501,32 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
-.menu-link:hover, .menu-link:focus { background: rgba(0,0,0,0.04); transform: translateX(-4px); outline: none; }
+.menu-link:hover, .menu-link:focus { background: var(--active-bg); transform: translateX(-4px); outline: none; color: var(--text-color); }
+
+/* Generic interactive element hover and active states — yellow background with black text */
+a, a:link, a:visited { color: var(--text-color); }
+a:hover, a:focus, a:active { background: var(--active-bg); color: var(--text-color); }
+
+button:hover, button:focus, button:active,
+.filter-btn:hover, .filter-btn:focus, .filter-btn:active,
+.hamburger-btn:hover, .hamburger-btn:focus, .hamburger-btn:active,
+.notif-btn:hover, .notif-btn:focus, .notif-btn:active { background: var(--active-bg); color: var(--text-color); outline: none; }
 
 /* Dismiss overlay backdrop when menu open (semi-transparent) */
 .menu-backdrop {
+    /* keep backdrop for click-to-close but don't dim the page */
     position: fixed;
     left: 0;
     right: 0;
     top: var(--header-height, 72px);
     height: calc(100vh - var(--header-height, 72px));
-    background: rgba(0,0,0,0.36);
+    background: transparent; /* no dimming */
     z-index: 1100;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 320ms ease;
+    opacity: 1; /* always fully transparent visually */
+    pointer-events: none; /* enable only when visible below */
+    transition: none;
 }
-.menu-backdrop.visible { opacity: 1; pointer-events: auto; }
+.menu-backdrop.visible { pointer-events: auto; }
 
 @media (min-width: 769px) {
     /* On wider screens show as a smaller panel */
@@ -1035,9 +1116,10 @@ body {
     flex-direction: column;
     scroll-snap-align: start;
     flex: 0 0 auto; /* prevent shrinking so horizontal scroll behaves consistently */
-    border: none; /* remove outer borders */
+    border: 1px solid #ff9736; /* 1px solid black border as requested */
     background: transparent !important; /* keep only image */
-    box-shadow: none !important; /* no drop shadow */
+    /* subtle default black shadow to ground the card; user requested 'black box shadow' */
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.26);
     position: relative; /* ensure absolute children still position relative to card */
     padding: 0; /* remove internal padding so image is the only content */
 }
@@ -1047,9 +1129,26 @@ body {
     max-width: 300px;
 }
 
-.collection-card:hover {
-    transform: translateY(-12px) scale(1.01);
-    z-index: 5; /* ensure pop-out is above neighbors */
+.collection-card:active, .collection-card:focus { /* keep card steady when tapped/clicked */
+    transform: translateY(0) scale(1) !important;
+    z-index: auto !important;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.26) !important;
+}
+
+/* When the card is clicked/tapped, ensure the image itself does not scale */
+.collection-card:active .card-background img,
+.collection-card:focus .card-background img {
+    transform: none !important;
+}
+
+/* Only apply hover scale on devices that support hover (mouse/stylus). Avoids accidental 'hover' on touch devices. */
+@media (hover: hover) {
+    .collection-card:hover {
+        transform: translateY(-12px) scale(1.01);
+        z-index: 5; /* ensure pop-out is above neighbors */
+        /* slightly stronger shadow on hover to match the 'lift' animation */
+        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.36);
+    }
 }
 
 .collection-card::before { display: none; }

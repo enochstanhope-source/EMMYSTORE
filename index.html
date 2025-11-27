@@ -24,6 +24,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=checkroom"
     />
+    <!-- removed individual material symbol font for 'home' in favor of local svg icons -->
     <style>
       .material-symbols-outlined {
         font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
@@ -104,9 +105,30 @@
       <!-- Off-canvas Main Menu (toggled by hamburger) -->
       <nav id="main-menu" class="main-menu" role="navigation" aria-hidden="true" hidden>
         <ul class="menu-list">
-          <li><a href="#" class="menu-link">Home</a></li>
-          <li><a href="#" class="menu-link">Store</a></li>
-          <li><a href="#" class="menu-link">Checkout <span id="cart-count" class="cart-badge" aria-hidden="true">0</span></a></li>
+          <li>
+            <a href="#" class="menu-link">
+              <img src="icons/homeicon.svg" class="menu-icon" width="20" height="20" alt="" aria-hidden="true" />
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-link">
+              <img src="icons/storeicon.svg" class="menu-icon" width="20" height="20" alt="" aria-hidden="true" />
+              Store
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-link">
+              <img src="icons/payicon.svg" class="menu-icon" width="20" height="20" alt="" aria-hidden="true" />
+              Checkout <span id="cart-count" class="cart-badge" aria-hidden="true">0</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="menu-link">
+              <img src="icons/supporticon.svg" class="menu-icon" width="20" height="20" alt="" aria-hidden="true" />
+              Contact
+            </a>
+          </li>
         </ul>
       </nav>
 
@@ -206,7 +228,7 @@
                 </button>
                 <h4 class="card-title">Poncho Coat</h4>
                 <img
-                  src="images/pnco.jpg"
+                  src="images/jackbrown.jpg"
                   alt="Poncho Coat"
                   loading="lazy"
                   decoding="async"
@@ -303,7 +325,7 @@
                 </button>
                 <h4 class="card-title">Waler Bonnet</h4>
                 <img
-                  src="images/jackbrown.jpg"
+                  src="images/pnco.jpg"
                   alt="Third"
                   loading="lazy"
                   decoding="async"
