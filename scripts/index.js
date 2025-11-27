@@ -8,7 +8,74 @@ categoryButtons.forEach(button => {
         this.classList.add('active');
         this.setAttribute('aria-pressed', 'true');
     });
+
+    // If this is the 'All' category, scroll to collections section when clicked
+    if (button.classList.contains('category-all')) {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            try {
+                const main = document.querySelector('.main-content');
+                const collections = document.querySelector('.collections-section');
+                if (!main || !collections) return;
+                const mainRect = main.getBoundingClientRect();
+                const sectionRect = collections.getBoundingClientRect();
+                // Compute scroll top within the scrollable main element
+                const top = Math.max(0, sectionRect.top - mainRect.top + main.scrollTop);
+                if (main.scrollTo) main.scrollTo({ top: Math.round(top), behavior: 'smooth' });
+                else main.scrollTop = Math.round(top);
+                // Focus main for accessibility
+                try { main.focus({ preventScroll: true }); } catch (err) { main.focus && main.focus(); }
+            } catch (err) { /* ignore */ }
+        });
+    }
 });
+
+// Fallback: ensure any 'Home' menu links always scroll to top and close the menu
+(function() {
+    const homeLinks = document.querySelectorAll('.menu-link[data-action="home"]');
+    if (!homeLinks || !homeLinks.length) return;
+    homeLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Close/hide the off-canvas menu and backdrop if present
+            try {
+                const hamburger = document.querySelector('.hamburger-btn');
+                const menu = document.getElementById('main-menu');
+                const backdrop = document.querySelector('.menu-backdrop');
+                if (hamburger) {
+                    hamburger.classList.remove('open');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                }
+                if (menu) {
+                    menu.classList.remove('open');
+                    try { menu.setAttribute('aria-hidden', 'true'); } catch (err) {}
+                    try { menu.hidden = true; } catch (err) {}
+                }
+                if (backdrop) backdrop.classList.remove('visible');
+            } catch (err) { /* ignore */ }
+
+            // Set first nav button active for consistent state
+            try {
+                if (typeof navButtons !== 'undefined' && navButtons && navButtons.length) {
+                    navButtons.forEach((btn, idx) => {
+                        if (idx === 0) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+                        else { btn.classList.remove('active'); btn.setAttribute('aria-pressed', 'false'); }
+                    });
+                }
+            } catch (err) {}
+
+            // Scroll the main content (or window) to top and focus it for accessibility
+            try {
+                const main = document.querySelector('.main-content');
+                if (main && main.scrollTo) main.scrollTo({ top: 0, behavior: 'smooth' });
+                else window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (main && typeof main.focus === 'function') main.focus({ preventScroll: true });
+            } catch (err) {
+                try { const main = document.querySelector('.main-content'); if (main) main.scrollTop = 0; else document.documentElement.scrollTop = 0; } catch (e) {}
+            }
+        });
+    });
+})();
 
 // Navigation button functionality
 const navButtons = Array.from(document.querySelectorAll('.nav-btn'));
@@ -294,6 +361,61 @@ if (hamburgerBtn) {
             hamburgerBtn.focus();
         }
     });
+
+    // Logo click should act like 'Home' — navigate to top and set Home nav active
+    const logo = document.querySelector('.logo');
+    if (logo) {
+        logo.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Set Home/first nav as active
+            if (navButtons && navButtons.length) {
+                navButtons.forEach((btn, idx) => {
+                    if (idx === 0) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+                    else { btn.classList.remove('active'); btn.setAttribute('aria-pressed', 'false'); }
+                });
+            }
+            // Close the menu if open
+            try { if (hamburgerBtn.classList.contains('open')) closeMenu(); } catch (err) {}
+            // Smooth scroll to top of the main content or window
+            const main = document.querySelector('.main-content');
+            try {
+                if (main && main.scrollTo) main.scrollTo({ top: 0, behavior: 'smooth' });
+                else window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Move keyboard focus to the main content for better accessibility
+                if (main && typeof main.focus === 'function') main.focus({ preventScroll: true });
+            } catch (err) { if (main) { main.scrollTop = 0; try { main.focus(); } catch (er) {} } else document.documentElement.scrollTop = 0; }
+            // Mark attached so we don't attach a duplicate handler later
+            try { logo._homeClickHandlerAttached = true; } catch (e) {}
+        });
+    }
+
+    // Menu links: close menu and, if Home was clicked, scroll to top and set Home active
+    if (menu) {
+        const menuLinks = menu.querySelectorAll('.menu-link');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // prevent default anchors (all links are '#') and handle behavior
+                e.preventDefault();
+                // close menu first
+                try { closeMenu(); } catch (err) {}
+                // If Home was clicked, set navButtons and scroll to top
+                if (this.dataset && this.dataset.action === 'home') {
+                    if (navButtons && navButtons.length) {
+                        navButtons.forEach((btn, idx) => {
+                            if (idx === 0) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+                            else { btn.classList.remove('active'); btn.setAttribute('aria-pressed', 'false'); }
+                        });
+                    }
+                    const main = document.querySelector('.main-content');
+                    try {
+                        if (main && main.scrollTo) main.scrollTo({ top: 0, behavior: 'smooth' });
+                        else window.scrollTo({ top: 0, behavior: 'smooth' });
+                        if (main && typeof main.focus === 'function') main.focus({ preventScroll: true });
+                    } catch (err) { if (main) { main.scrollTop = 0; try { main.focus(); } catch (er) {} } else document.documentElement.scrollTop = 0; }
+                }
+            });
+        });
+    }
 }
 
 // spring animation keyframes moved to CSS for better performance
@@ -347,5 +469,84 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     setHeaderHeightVar();
     window.addEventListener('resize', setHeaderHeightVar);
+    // Ensure main content starts at the same position as a logo click when page loads
+    try {
+        const main = document.querySelector('.main-content');
+        if (main) {
+            if (main.scrollTo) main.scrollTo({ top: 0, behavior: 'auto' });
+            else main.scrollTop = 0;
+            try { if (typeof main.focus === 'function') main.focus({ preventScroll: true }); } catch (err) {}
+        }
+    } catch (err) {}
+    // Ensure clicking the logo always navigates Home/scrolls to top (even if hamburger absent)
+    try {
+        const logoCatch = document.querySelector('.logo');
+        if (logoCatch && !logoCatch._homeClickHandlerAttached) {
+            logoCatch.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Set first nav active
+                if (navButtons && navButtons.length) {
+                    navButtons.forEach((btn, idx) => {
+                        if (idx === 0) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+                        else { btn.classList.remove('active'); btn.setAttribute('aria-pressed', 'false'); }
+                    });
+                }
+                const main = document.querySelector('.main-content');
+                try {
+                    if (main && main.scrollTo) main.scrollTo({ top: 0, behavior: 'smooth' });
+                    else window.scrollTo({ top: 0, behavior: 'smooth' });
+                    if (main && typeof main.focus === 'function') main.focus({ preventScroll: true });
+                } catch (err) { if (main) main.scrollTop = 0; else document.documentElement.scrollTop = 0; }
+            });
+            logoCatch._homeClickHandlerAttached = true;
+        }
+    } catch (err) {}
+
+    // Universal Home handler: ensure any element with `data-action="home"`
+    // scrolls the main content into view, focuses it, and sets the first
+    // nav button as active. This covers cases where the menu/handlers
+    // might not have been attached directly to the element.
+    document.addEventListener('click', function (e) {
+        try {
+            const el = e.target && e.target.closest && e.target.closest('[data-action="home"]');
+            if (!el) return;
+            e.preventDefault();
+
+            // Set first nav active
+            if (navButtons && navButtons.length) {
+                navButtons.forEach((btn, idx) => {
+                    if (idx === 0) { btn.classList.add('active'); btn.setAttribute('aria-pressed', 'true'); }
+                    else { btn.classList.remove('active'); btn.setAttribute('aria-pressed', 'false'); }
+                });
+            }
+
+            // Smooth-scroll main content (or window) to top and focus it
+            const main = document.querySelector('.main-content');
+            try {
+                if (main && main.scrollTo) main.scrollTo({ top: 0, behavior: 'smooth' });
+                else window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (main && typeof main.focus === 'function') main.focus({ preventScroll: true });
+            } catch (err) {
+                try { if (main) main.scrollTop = 0; else document.documentElement.scrollTop = 0; } catch (e) {}
+            }
+
+            // Close menu/backdrop if open
+            try {
+                const hamburger = document.querySelector('.hamburger-btn');
+                const menu = document.getElementById('main-menu');
+                const backdrop = document.querySelector('.menu-backdrop');
+                if (hamburger && hamburger.classList.contains('open')) {
+                    hamburger.classList.remove('open');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                }
+                if (menu) {
+                    menu.classList.remove('open');
+                    try { menu.setAttribute('aria-hidden', 'true'); } catch (err) {}
+                    try { menu.hidden = true; } catch (err) {}
+                }
+                if (backdrop) backdrop.classList.remove('visible');
+            } catch (err) { /* ignore */ }
+        } catch (err) { /* ignore */ }
+    });
 });
 

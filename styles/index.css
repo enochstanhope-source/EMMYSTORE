@@ -94,7 +94,7 @@ body {
     align-items: flex-start;
     position: sticky; /* keep header fixed at the top */
     top: 0;
-    z-index: 1400; /* above the menu so header stays visually steady */
+    z-index: 1400; /* header sits above most content; menu is above this (z-index:1500) */
     will-change: transform; /* hint to avoid jank when menu animates underneath */
     /* create a new compositing layer to reduce repaints/jank */
     transform: translateZ(0);
@@ -174,11 +174,12 @@ body {
             transition: box-shadow 0.18s ease, transform 180ms ease;
             color: var(--text-color); /* main text color */
         }
+        /* Keep logo appearance identical on hover/focus to avoid moving/adding visual styles
+           (accessible outline when keyboard-focused is still preserved via :focus-visible). */
         .logo:hover, .logo:focus {
-            /* keep the logo vertically aligned with the hamburger by using the same offset variable */
-            transform: translateY(calc(var(--hamburger-offset, 0px) - calc(var(--logo-nudge) + 2px)));
-            box-shadow: 0 12px 38px rgba(182,135,44,0.12);
-            background: var(--active-bg);
+            transform: translateY(calc(var(--hamburger-offset, 0px) - var(--logo-nudge)));
+            box-shadow: 0 6px 20px rgba(182,135,44,0.06);
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.92));
         }
         .logo-emblem {
             display: flex;
@@ -233,7 +234,7 @@ body {
 .notif-badge { position:absolute; top:6px; right:6px; background:#e63946; color:#fff; font-size:11px; padding:0 6px; height:18px; line-height:18px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 8px rgba(0,0,0,0.12); }
 /* keyboard focus styles for notification */
 .notif-btn:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 12px; transform: translateY(calc(var(--hamburger-offset, 0px) - 1px)); }
-.logo:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 8px; transform: translateY(calc(var(--hamburger-offset, 0px) - calc(var(--logo-nudge) + 2px))); }
+.logo:focus-visible { outline: 3px solid rgba(205,162,79,0.18); outline-offset: 2px; border-radius: 8px; /* keep focus visible but avoid movement on click */ }
 
 @media (max-width: 420px) {
     /* Keep the logo text visible on narrow screens, scale it down to fit */
@@ -276,6 +277,15 @@ body {
     outline: none;
     background: #e8e8e8; /* slightly darker on focus for subtle contrast */
     box-shadow: 0 0 0 2px rgba(45, 134, 89, 0.1);
+}
+
+/* When JS focuses the main content on page load, some browsers show a visible outline.
+   Hide that outline here while preserving focusability for screen-readers. */
+.main-content:focus {
+    outline: none;
+}
+.main-content:focus-visible {
+    outline: none;
 }
 
 /* class-based focus styling for JS-managed focus to avoid inline style overrides */
@@ -379,7 +389,8 @@ body {
     transform-origin: right center;
     /* slower, smoother slide + fade for a more graceful entrance */
     transition: transform 520ms cubic-bezier(.16,.84,.24,1), opacity 360ms ease;
-    z-index: 1200;
+     /* Raise the menu above the header (z-index 1400) so it doesn't get covered on iOS Safari. */
+     z-index: 1500;
     padding: 18px 12px 24px 12px; /* internal padding; top padding accounted by top var */
     -webkit-overflow-scrolling: touch;
     border-radius: 12px 0 0 12px; /* rounded left edge */
@@ -521,7 +532,8 @@ button:hover, button:focus, button:active,
     top: var(--header-height, 72px);
     height: calc(100vh - var(--header-height, 72px));
     background: transparent; /* no dimming */
-    z-index: 1100;
+    /* Keep backdrop behind the menu but above page content -> slightly lower than menu */
+    z-index: 1490;
     opacity: 1; /* always fully transparent visually */
     pointer-events: none; /* enable only when visible below */
     transition: none;
