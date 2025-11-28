@@ -1,7 +1,7 @@
 /* Dynamic Product Page Styles */
 :root{ --bg:#f8f6f2; --card:#fff; --muted:#8b8b8b; --accent:#0f8a46; }
 *{box-sizing:border-box}
-body{font-family: 'Poppins', 'Roboto', system-ui, sans-serif; background:var(--bg); margin:0; color:#222}
+body{font-family: 'Roboto', Arial, system-ui, sans-serif; background:var(--bg); margin:0; color:#222}
 .product-page{max-width:420px;margin:16px auto;padding-bottom:24px;opacity:1;transform:none;transition:none}
 .product-page.page-enter { opacity: 1; transform: none }
 .product-page.page-exit { opacity: 1; transform: none }
@@ -58,6 +58,8 @@ body.light-bg { background: linear-gradient(180deg, rgba(255,255,255,1), rgba(25
 .sizes button{border:1px solid rgba(0,0,0,.06);padding:10px 12px;border-radius:999px;background:#fff;cursor:pointer}
 .sizes button.active{background:var(--accent);color:#fff;border-color:transparent}
 .sizes button { transition: none; }
+/* Ensure form controls and interactive elements use the same font family */
+button, input, textarea, select, a { font-family: 'Roboto', Arial, sans-serif; }
 .colors{display:flex;gap:8px}
 .color-swatch{border-radius:999px;width:34px;height:34px;border:1px solid rgba(0,0,0,.06);cursor:pointer}
 .color-swatch.active{box-shadow:inset 0 0 0 2px rgba(0,0,0,.06),0 6px 12px rgba(0,0,0,.06)}
@@ -85,9 +87,9 @@ body.light-bg { background: linear-gradient(180deg, rgba(255,255,255,1), rgba(25
 .description h2{font-size:14px;margin:0 0 8px}
 .product-desc{font-size:14px;color:#444;margin:0}
 .cta-row{display:flex;gap:12px;margin-top:12px}
-.add-cart-btn,.buy-now-btn{flex:1;padding:12px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
+.add-cart-btn,.buy-now-btn{flex:1;padding:12px;border-radius:12px;border:0;cursor:pointer;font-weight:700;text-decoration:none}
 .add-cart-btn{background:transparent;border:1px solid rgba(0,0,0,.08)}
-.buy-now-btn{background:var(--accent);color:#fff}
+.buy-now-btn{background:var(--accent);color:#fff;text-decoration:none}
 
 @media (max-width:640px){
 	.product-page{margin:8px}

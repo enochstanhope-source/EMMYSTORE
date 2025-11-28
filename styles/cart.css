@@ -1,15 +1,16 @@
 /* cart.css — modern cart layout matching the dynamic UI color system */
 :root{ --bg:#f8f6f2; --card:#fff; --muted:#7a7a7a; --accent:#0f8a46; --primary:#b6872c; --danger:#c43; }
 *{box-sizing:border-box}
-body{background:var(--bg);color:#222;font-family:'Poppins','Roboto',system-ui,sans-serif}
+body{background:var(--bg);color:#222;font-family:'Roboto', Arial, system-ui, sans-serif}
 .cart-section{max-width:920px;margin:24px auto;padding:18px;display:grid;grid-template-columns:1fr 360px;gap:20px}
 .cart-title{font-size:20px;margin:0 0 12px;font-weight:700}
 .cart-list{display:flex;flex-direction:column;gap:14px}
-.cart-row{display:grid;grid-template-columns:96px 1fr 140px 120px;gap:12px;align-items:center;background:var(--card);padding:12px 60px 12px 12px;border-radius:14px;box-shadow:0 8px 30px rgba(8,10,20,0.04);position:relative;transition:transform 180ms ease, box-shadow 180ms ease}
+.cart-row{display:grid;grid-template-columns:96px 1fr 140px auto;gap:12px;align-items:center;background:var(--card);padding:12px 60px 12px 12px;border-radius:14px;box-shadow:0 8px 30px rgba(8,10,20,0.04);position:relative;transition:transform 180ms ease, box-shadow 180ms ease}
 .cart-row:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(8,10,20,0.06)}
 .cart-row:focus-within{outline:3px solid rgba(182,135,44,0.06)}
 .cart-image-wrap img{width:88px;height:88px;border-radius:12px;object-fit:cover;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
 .cart-item-details{display:flex;flex-direction:column;gap:6px}
+.cart-item-details, .cart-item-qty, .cart-item-price, .price, .price-total { min-width: 0; }
 .cart-item-title{font-weight:700;font-size:15px;color:#111}
 .cart-item-meta{display:flex;gap:8px;align-items:center}
 .cart-item-meta .meta-size{padding-right:8px}
@@ -17,6 +18,8 @@ body{background:var(--bg);color:#222;font-family:'Poppins','Roboto',system-ui,sa
 .meta-color{display:inline-block;width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,0.06);box-shadow:0 2px 6px rgba(0,0,0,0.06)}
 .cart-item-qty{display:flex;gap:8px;align-items:center;justify-content:center}
 .qty-btn{display:inline-flex;align-items:center;justify-content:center;width:36px;height:32px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#fff;cursor:pointer;font-weight:700;color:#111}
+/* Ensure form controls like buttons and inputs use the same UI font */
+button, input, textarea, select, a { font-family: 'Roboto', Arial, sans-serif; }
 .qty-btn{background:#fff}
 .qty-btn:hover{background:linear-gradient(180deg, rgba(240,240,240,1), rgba(245,245,246,1))}
 .qty-btn.inc{background:linear-gradient(90deg, rgba(15,138,70,0.06), rgba(255,255,255,0.2));color:var(--accent)}
@@ -33,7 +36,7 @@ body{background:var(--bg);color:#222;font-family:'Poppins','Roboto',system-ui,sa
 .cart-item-price{display:flex;justify-content:flex-end;align-items:center;text-align:right}
 .price-per{color:var(--muted);font-size:12px;margin-top:4px}
 .price-per:before{content:''}
-.price-total{font-weight:800;margin-left:8px;font-size:16px;text-align:right;color:#111}
+.price-total{font-weight:800;margin-left:8px;font-size:16px;text-align:right;color:#ff6a00;text-shadow:0 6px 18px rgba(255,106,0,0.10);white-space:nowrap}
 .remove-btn{background:transparent;border:0;color:var(--danger);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;position:absolute;right:10px;top:8px;width:42px;height:42px;border-radius:50%;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,0.08);transition:transform 150ms ease, background 160ms ease;z-index:40}
 .remove-btn:focus-visible{outline:3px solid rgba(196,67,67,0.08);outline-offset:2px}
 .remove-btn svg{opacity:0.95;transition:transform 150ms ease}
@@ -44,15 +47,155 @@ body{background:var(--bg);color:#222;font-family:'Poppins','Roboto',system-ui,sa
 .summary-inner .summary-title{display:block;font-weight:800;margin-bottom:12px;font-size:16px}
 .muted-link{display:block;margin-top:8px;color:var(--muted);font-size:14px;text-decoration:none}
 .address-section{margin-top:12px}
-.address-panel{display:flex;flex-direction:column;gap:8px}
-.address-field{border:1px solid rgba(0,0,0,0.06);padding:10px;border-radius:10px;background:#fafafa}
-.process-btn{background:linear-gradient(90deg, var(--primary), #ff6a00);color:#fff;border:0;padding:12px 14px;border-radius:999px;cursor:pointer;font-weight:700;display:block;width:100%;box-shadow:0 8px 22px rgba(182,135,44,0.12)}
-.process-btn[disabled]{opacity:0.6;cursor:not-allowed}
+.section-label{display:flex;align-items:center;gap:10px;margin:0 0 8px;font-weight:700;font-size:15px}
+.section-label .section-label-icon{width:18px;height:18px;display:block;margin-right:6px}
+.address-panel{display:flex;flex-direction:row;gap:8px;align-items:center}
+.address-field{border:1px solid rgba(0,0,0,0.06);padding:10px;border-radius:10px;background:#fafafa;flex:1}
+
+/* Focus style for the address input: remove any darker/black outline and use a 1px orange border */
+.address-field:focus, .address-field:focus-visible{
+  outline: none; /* remove default browser outline */
+  border: 1px solid #ff6a0067; /* 1px orange border */
+  box-shadow: 0 0 0 3px rgba(255,106,0,0.06); /* subtle ring for visibility */
+}
+.address-saved { background: linear-gradient(180deg, rgba(234, 247, 255, 0.75), rgba(245, 255, 255, 0.75)); border-color: rgba(45,134,89,0.06) !important; box-shadow: 0 0 0 3px rgba(45,134,89,0.06); }
+.contact-saved { background: linear-gradient(180deg, rgba(234, 247, 255, 0.75), rgba(245, 255, 255, 0.75)); border-color: rgba(45,134,89,0.06) !important; box-shadow: 0 0 0 3px rgba(45,134,89,0.06); }
+.contact-field.invalid { border: 1px solid #c43 !important; box-shadow: 0 0 0 3px rgba(196,67,67,0.06) !important; }
+.input-error{ color:#c43; font-size:12px; margin-top:6px; display:none }
+.input-error.visible{ display:block }
+
+/* Focus styling for contact inputs (name and phone) — mirror address focus behavior */
+.contact-field:focus, .contact-field:focus-visible {
+  outline: none; /* keep focus visible using border & ring */
+  border: 1px solid #ff6a0067; /* 1px orange border */
+  box-shadow: 0 0 0 3px rgba(255,106,0,0.06);
+}
+
+.address-actions{display:flex;gap:8px}
+
+/* Contact panel shares layout with address panel */
+.contact-panel{display:flex;flex-direction:row;gap:12px;align-items:center}
+.contact-panel .contact-field{border:1px solid rgba(0,0,0,0.06);padding:10px;border-radius:10px;background:#fafafa;width:100%}
+.contact-fields-wrapper{display:flex;flex-direction:column;gap:8px;margin-left:10px;flex:0 0 320px;}
+.contact-actions{display:flex;gap:8px}
+.address-action-btn{background:linear-gradient(180deg,#ff6a00,#d95b00);color:#fff;border:0;height:44px;padding:0 12px;border-radius:12px;cursor:pointer;font-weight:700;box-shadow:0 10px 26px rgba(255,106,0,0.12);display:inline-flex;align-items:center;justify-content:center}
+.address-action-btn.btn-neutral{background:linear-gradient(180deg,#f5f5f5,#ffffff);color:#222;box-shadow:0 8px 18px rgba(0,0,0,0.04)}
+.address-action-btn.btn-danger{background:linear-gradient(180deg,#ff8b8b,#ff6666);color:#fff;box-shadow:0 8px 18px rgba(196,67,67,0.08)}
+
+/* Show the delete PNG in its original colors: use a neutral white background
+   for the delete icon button so the image's colors aren't visually altered
+   by the red gradient used for other danger actions. */
+#address-delete-btn{
+  background:#fff !important;
+  box-shadow:0 8px 18px rgba(0,0,0,0.06) !important;
+  color:inherit !important;
+  padding:0 !important;
+}
+#address-delete-btn img{
+  display:block;
+  width:16px;
+  height:16px;
+  object-fit:contain;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+#address-delete-btn[disabled]{opacity:0.55;cursor:not-allowed}
+
+/* Make contact delete icon button look exactly like address delete button */
+#contact-delete-btn{
+  background:#fff !important;
+  box-shadow:0 8px 18px rgba(0,0,0,0.06) !important;
+  color:inherit !important;
+  padding:0 !important;
+}
+#contact-delete-btn img{
+  display:block;
+  width:16px;
+  height:16px;
+  object-fit:contain;
+  filter:none !important;
+  mix-blend-mode:normal !important;
+}
+#contact-delete-btn[disabled]{opacity:0.55;cursor:not-allowed}
+
+/* Primary action (used on save button): green-to-black gradient */
+.address-action-btn.btn-primary{background:linear-gradient(180deg,var(--accent), #000);color:#fff;box-shadow:0 10px 26px rgba(15,138,70,0.12)}
+.address-action-btn.btn-primary svg path{stroke:#fff}
+.address-action-btn.btn-primary:hover{box-shadow:0 12px 30px rgba(15,138,70,0.16);transform:translateY(-2px)}
+.address-action-btn.btn-primary:active{transform:translateY(1px)}
+.address-action-btn.btn-primary[disabled]{opacity:0.55;cursor:not-allowed;filter:grayscale(0.12)}
+.address-action-btn.btn-danger svg path{stroke:#fff}
+.address-action-btn.btn-neutral svg path{stroke:#222}
+.address-action-btn.btn-neutral:hover{box-shadow:0 10px 26px rgba(0,0,0,0.06);transform:translateY(-2px)}
+.address-action-btn.btn-danger:hover{box-shadow:0 12px 30px rgba(196,67,67,0.1);transform:translateY(-2px)}
+.address-action-btn:active{transform:translateY(1px)}
+.address-action-btn[disabled]{opacity:0.55;cursor:not-allowed}
+/* Generic circular icon button */
+.icon-btn{width:44px;height:44px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.icon-btn svg{display:block}
+.icon-btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.icon-btn:focus-visible{outline:3px solid rgba(15,138,70,0.12);outline-offset:2px}
+/* Saved addresses list */
+.address-list{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.address-item{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:10px;padding:10px 12px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 6px 18px rgba(0,0,0,0.04)}
+.address-item .address-text{flex:1;color:#111;font-size:14px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:12px}
+.address-item .address-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.address-item .address-icon{width:18px;height:18px;object-fit:contain;display:block}
+.address-item .address-text-wrap{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.address-item .address-badge{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.address-item .address-actions{display:flex;gap:8px;align-items:center}
+.address-item .use-btn{border:0;background:linear-gradient(180deg, rgba(15,138,70,0.08), rgba(15,138,70,0.06));color:var(--accent);cursor:pointer;padding:6px 8px;border-radius:8px}
+.address-item .use-btn.icon-btn{width:36px;height:36px;border-radius:999px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg, #eaf6ef, #dff2e6);box-shadow:0 6px 18px rgba(15,138,70,0.06)}
+.address-item .remove-item-btn{border:0;background:transparent;color:var(--danger);cursor:pointer;padding:6px 8px;border-radius:8px}
+.address-item .remove-item-btn.icon-btn{width:36px;height:36px;border-radius:999px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#fff,#fff);box-shadow:0 6px 18px rgba(196,67,67,0.06);color:var(--danger)}
+.address-item .use-btn.icon-btn:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(15,138,70,0.08)}
+.address-item .remove-item-btn.icon-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(196,67,67,0.08)}
+.address-item.selected{border-color:rgba(15,138,70,0.12);box-shadow:0 10px 26px rgba(15,138,70,0.06)}
+.address-item .remove-item-btn:focus-visible, .address-item .use-btn:focus-visible{outline:3px solid rgba(15,138,70,0.12);outline-offset:2px}
+@media (max-width:880px){
+  .address-panel{flex-direction:column;align-items:stretch}
+  .address-actions{justify-content:flex-end}
+  .address-action-btn{width:44px}
+  .contact-panel{flex-direction:column;align-items:stretch}
+  .contact-fields-wrapper{margin-left:0;flex:1;width:100%}
+}
+
+/* Chip-style selected address inside the input field */
+.address-input-wrap{display:flex;align-items:center;gap:8px;border:1px solid rgba(0,0,0,0.06);border-radius:10px;padding:6px 10px;background:#fafafa;flex:1}
+.address-input-wrap .address-chips{display:flex;gap:8px;align-items:center}
+.address-chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:6px 8px;font-size:13px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 6px 18px rgba(0,0,0,0.04);max-width:360px;overflow:hidden}
+.address-chip-icon{width:14px;height:14px;display:block}
+.address-chip-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.address-chip-remove{width:24px;height:24px;border-radius:50%;padding:0;background:transparent;border:0;color:#c43;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.address-chip-remove:hover{background:#fff;box-shadow:0 6px 18px rgba(196,67,67,0.06)}
+.address-input-wrap .address-field{border:0;padding:8px;height:auto;background:transparent;flex:1;min-width:80px}
+.address-input-wrap:focus-within{border:1px solid #ff6a0067;box-shadow:0 0 0 3px rgba(255,106,0,0.06)}
+.process-btn{background:linear-gradient(90deg, var(--primary), #ff6a00);color:#fff;border:0;padding:12px 14px;border-radius:12px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;box-shadow:0 8px 22px rgba(182,135,44,0.12);transition:transform 160ms ease,box-shadow 160ms ease;flex:1;width:auto}
+.process-btn[disabled]{opacity:0.6;cursor:not-allowed;filter:grayscale(0.06)}
+.process-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 34px rgba(182,135,44,0.16)}
+.process-btn:active:not(:disabled){transform:translateY(0)}
+.process-btn:focus-visible{outline:3px solid rgba(182,135,44,0.14);outline-offset:4px}
 .summary-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
 .summary-row.total{font-size:16px}
-.summary-actions{display:flex;gap:8px;margin-top:12px}
-.buy-now-btn{background:linear-gradient(90deg, var(--primary), #ff6a00);color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 8px 24px rgba(182,135,44,0.12)}
+.summary-actions{display:flex;gap:8px;margin-top:12px;align-items:center}
+.buy-now-btn{background:linear-gradient(90deg, var(--primary), #ff6a00);color:#fff;border:0;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 8px 24px rgba(182,135,44,0.12);text-decoration:none}
 .add-cart-btn{background:transparent;border:1px solid rgba(0,0,0,0.08);padding:10px 14px;border-radius:10px;cursor:pointer}
+
+/* Inline cart validation/alert message shown above the summary actions */
+.cart-message{display:block;margin-top:10px;font-size:13px;color:var(--muted);font-weight:600}
+.cart-message--warning{color:var(--primary)} /* Your cart is empty: show brown/gold */
+.cart-message--error{color:var(--danger)} /* Address validation: show red */
+
+/* Clear Cart (destructive secondary action) — target specific id to avoid altering Add-to-Cart in other pages */
+#clear-cart{background:transparent;border:1px solid rgba(196,67,67,0.12);color:#c43;padding:10px 14px;border-radius:12px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.04);font-weight:700}
+#clear-cart:hover{background:linear-gradient(180deg, rgba(196,67,67,0.06), rgba(196,67,67,0.03));box-shadow:0 10px 28px rgba(196,67,67,0.06);transform:translateY(-2px)}
+#clear-cart:active{transform:translateY(0)}
+#clear-cart:focus-visible{outline:3px solid rgba(196,67,67,0.12);outline-offset:4px}
+#clear-cart[disabled]{opacity:0.6;cursor:not-allowed}
+
+/* Small responsive tweaks: make sure checkout bar uses compact layout */
+.cart-checkout-bar .process-btn{flex:0 0 auto;min-width:140px}
+#checkout-btn-mobile{padding:12px 16px;border-radius:12px}
 .cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:40px;text-align:center;background:transparent}
 .cart-empty img{opacity:0.96;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.06)}
 .cart-empty h2{font-size:20px;margin-top:6px}

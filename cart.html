@@ -6,6 +6,8 @@
     <title>Cart — EMMY APPAREL</title>
     <link rel="stylesheet" href="styles/index.css" />
     <link rel="stylesheet" href="styles/cart.css" />
+    <!-- jsPDF for client-side PDF generation (used for invoice creation) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
     <script defer src="scripts/cart.js"></script>
     <style>
       /* Add black shadow to cart rows rendered by JS */
@@ -80,13 +82,55 @@
             <a class="buy-now-btn" href="index.html">Continue shopping</a>
           </div>
 
-          <section class="address-section">
-            <h2 class="section-label">Address</h2>
-            <div class="address-panel">
-              <input id="address-field" class="address-field" type="text" placeholder="Add delivery address" value="1770 S Harbor Blvd. Ste 140, Anaheim, CA" />
-              <a class="muted-link" href="#" id="add-address">+ Add new address</a>
+          <!-- Contact (name + phone) input section — same save/delete UI as address -->
+          <section class="contact-section">
+            <h2 class="section-label"><img src="media%20icons/phone.png" alt="" class="section-label-icon" width="18" height="18" aria-hidden="true">Contact</h2>
+            <div class="contact-panel">
+              <div class="contact-fields-wrapper">
+                <input id="contact-name-field" class="contact-field" type="text" placeholder="Enter your full name" value="" aria-label="Full name" />
+                <div id="contact-name-error" class="input-error" hidden>Full name is required</div>
+                <input id="contact-phone-field" class="contact-field" type="tel" placeholder="Enter your phone number" value="" aria-label="Phone number" inputmode="tel" pattern="^[0-9+\-]{10,18}$" maxlength="18" minlength="10" />
+                <div id="contact-phone-error" class="input-error" hidden>Phone number must be 10–14 digits</div>
+                <div id="contact-required-error" class="input-error" hidden>Name and phone number required</div>
+              </div>
+              <div class="contact-actions address-actions">
+                <button id="contact-save-btn" class="address-action-btn icon-btn btn-primary" aria-label="Save contact" disabled>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+                <button id="contact-delete-btn" class="address-action-btn icon-btn btn-danger" aria-label="Delete saved contact" disabled>
+                  <img src="media%20icons/delete.png" alt="Delete contact" width="16" height="16" aria-hidden="true">
+                </button>
+              </div>
             </div>
           </section>
+          <section class="address-section">
+            <h2 class="section-label"><img src="media%20icons/add.png" alt="" class="section-label-icon" width="18" height="18" aria-hidden="true">Delivery Address</h2>
+              <div class="address-panel">
+              <input id="address-field" class="address-field" type="text" placeholder="Add receiving address" value="" aria-label="Delivery address" />
+              <div id="address-error" class="input-error" hidden>Delivery address is required</div>
+              <div class="address-actions">
+                <!-- Save is disabled by default until input has value -->
+                <button id="address-save-btn" class="address-action-btn icon-btn btn-primary" aria-label="Save address" disabled>
+                  <!-- iPhone-style check icon -->
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                </button>
+                <!-- Clear input -->
+        
+                <!-- Delete selected saved address (disabled until an address is selected) -->
+                <button id="address-delete-btn" class="address-action-btn icon-btn btn-danger" aria-label="Delete selected address" disabled>
+                  <!-- Delete PNG from media icons folder -->
+                  <img src="media%20icons/delete.png" alt="Delete address" width="16" height="16" aria-hidden="true">
+                </button>
+              </div>
+            </div>
+            <!-- saved-addresses list removed; we only keep the input field for a single saved address -->
+          </section>
+
+          
 
           <!-- removed duplicate muted continue link; primary orange button above list used instead -->
 
@@ -99,6 +143,9 @@
                 <strong>Total</strong>
                 <strong id="total">₦0</strong>
               </div>
+              <!-- Inline message area for checkout validation (hidden by default) -->
+              <div id="cart-message" class="cart-message" role="alert" aria-live="assertive" hidden></div>
+          
               <div class="summary-actions">
                 <button id="checkout-btn" class="process-btn" disabled>Process Transaction</button>
                 <button id="clear-cart" class="add-cart-btn">Clear cart</button>
@@ -107,17 +154,9 @@
           </aside>
         </section>
         <!-- Mobile bottom checkout bar (visible on small screens) -->
-        <div class="cart-checkout-bar" id="cart-checkout-bar">
-          <div class="checkout-inner">
-            <div class="checkout-total">
-              <div class="label">Total</div>
-              <div id="checkout-total-amt" class="value">₦0</div>
-            </div>
-            <button id="checkout-btn-mobile" class="process-btn" disabled>Process Transaction</button>
-          </div>
-        </div>
+       
       </main>
-  		<script src="scripts/dynamic.js" defer></script>
+      <script src="scripts/dynamic.js" defer></script>
   		<script>
   		// Close button: navigate back to referrer or history, fallback to home
   		(function(){
