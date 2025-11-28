@@ -147,9 +147,15 @@ document.addEventListener('DOMContentLoaded', function() {
 				for (let i=0;i<3;i++){
 					const ti = document.createElement('img'); ti.className = 'cart-toast-img'; ti.src = imgSrc; ti.alt = data.title; imgWrap.appendChild(ti);
 				}
+				const details = document.createElement('div'); details.className='cart-toast-details';
 				const txt = document.createElement('div'); txt.className = 'cart-toast-text'; txt.textContent = `${data.title} added to cart`;
+				// show selected size & color visually
+				const meta = document.createElement('div'); meta.className = 'cart-toast-meta';
+				if (selectedSize) { const sizeSpan = document.createElement('span'); sizeSpan.className='cart-toast-size'; sizeSpan.textContent = `Size: ${selectedSize}`; meta.appendChild(sizeSpan); }
+				if (selectedColor) { const colorSw = document.createElement('span'); colorSw.className='cart-toast-color'; colorSw.setAttribute('role','img'); colorSw.setAttribute('aria-label', `Selected color ${selectedColor}`); colorSw.style.background = selectedColor; meta.appendChild(colorSw); }
+				details.appendChild(txt); details.appendChild(meta);
 				toast.appendChild(imgWrap);
-				toast.appendChild(txt);
+				toast.appendChild(details);
 				document.body.appendChild(toast);
 				setTimeout(() => toast.classList.add('visible'), 10);
 				setTimeout(() => { toast.classList.remove('visible'); setTimeout(() => toast.remove(), 200); }, 2000);
