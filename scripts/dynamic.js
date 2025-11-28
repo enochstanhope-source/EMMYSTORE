@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (!data) {
 		// show fallback and wait for 500ms then go back
 		if (titleEl) titleEl.textContent = 'No product selected';
-		setTimeout(() => { window.location.href = 'EMMYSTORE-main/index.html'; }, 900);
+		setTimeout(() => { window.location.href = 'index.html'; }, 900);
 		return;
 	}
 
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (titleEl) titleEl.textContent = data.title || 'Product';
 	if (priceEl) priceEl.textContent = data.priceText || '—';
 	if (mainImg) {
-		mainImg.src = data.image || 'EMMYSTORE-main/images/jackbrown.jpg';
+		mainImg.src = data.image || 'images/jackbrown.jpg';
 		mainImg.alt = data.imageAlt || data.title || 'Product';
 	}
 	if (descEl) descEl.textContent = data.description || '—';
@@ -70,6 +70,15 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (mainImg) mainImg.src = src || data.image;
 			// Ensure stars are present and properly colored whenever image changes
 			try { const stars = document.querySelector('.stars'); if (stars) stars.classList.add('stars--active'); } catch(e){}
+			// Auto-select color if this thumbnail corresponds to a color-image mapping
+			try {
+				for (const clr in colorImageMap) {
+					if (colorImageMap[clr] === src && colorElementMap[clr]) {
+						try { if (typeof colorElementMap[clr]._selectColor === 'function') colorElementMap[clr]._selectColor(); else colorElementMap[clr].click(); } catch (e) {}
+						break;
+					}
+				}
+			} catch (e) {}
 		});
 		if (idx === 0) b.classList.add('active');
 		thumbsWrapper.appendChild(b);
@@ -167,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Close -> immediate back navigation with no animations or delays
 	if (closeBtn) closeBtn.addEventListener('click', function() {
-		try { if (history.length > 1) history.back(); else window.location.href = 'EMMYSTORE-main/index.html'; } catch (e) { window.location.href = 'EMMYSTORE-main/index.html'; }
+		try { if (history.length > 1) history.back(); else window.location.href = 'index.html'; } catch (e) { window.location.href = 'index.html'; }
 	});
 });
 

@@ -329,9 +329,9 @@ collectionCards.forEach(card => {
         const reviewsCountEl = this.querySelector('.reviews-count');
         const badgeEl = this.querySelector('.badge');
 
-        // Normalize image path so it works from dynamic.html (root) and from index.html location
+        // Normalize image path: keep it relative to the current folder - don't add extra prefixes
         let imgSrc = imgEl ? imgEl.getAttribute('src') : '';
-        if (imgSrc && !/^https?:|^\/|^EMMYSTORE-main\//.test(imgSrc)) imgSrc = 'EMMYSTORE-main/' + imgSrc.replace(/^\.\//, '');
+        if (imgSrc) imgSrc = imgSrc.replace(/^\.\//, '');
 
         const product = {
             id: this.dataset.productId || (titleEl ? titleEl.textContent.trim().toLowerCase().replace(/\s+/g,'-') : 'item'),
@@ -350,7 +350,7 @@ collectionCards.forEach(card => {
 
         try { localStorage.setItem('selectedProduct', JSON.stringify(product)); } catch (err) { console.warn('Unable to save selectedProduct', err); }
         // Instant switch: navigate immediately with no animations or delays.
-        try { window.location.href = '../dynamic.html'; } catch (err) { window.location.href = '../dynamic.html'; }
+        try { window.location.href = 'dynamic.html'; } catch (err) { window.location.href = 'dynamic.html'; }
     });
 });
 
