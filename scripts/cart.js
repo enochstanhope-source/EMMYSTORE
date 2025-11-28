@@ -23,6 +23,12 @@
   // Optional backend endpoint: POST generated invoice files to this server which will send via WhatsApp Cloud API
   // If empty, checkout will attempt to share via OS share/clipboard and/or download, but will not redirect to wa.me
   const WHATSAPP_SERVER_SEND_URL = '';
+  // Optional file upload endpoint used to host generated invoices so they can be shared via a link
+  // Defaults to a local helper server shipped with the project. Adjust if your server runs elsewhere.
+  const UPLOAD_SERVER_URL = (function(){
+    // try to use same host as the server in this repository by default
+    return 'http://localhost:3001/upload';
+  })();
 
   function sanitizeMerchantNumber(raw) {
     try {
@@ -86,7 +92,7 @@
       return arr.map(it => ({
         key: it.key || (it.id ? (it.id + '::' + (it.size || '') + '::' + (it.color || '')) : (it.title || '') ),
         id: it.id || (it.title || ''),
-        title: it.title || it.name || 'Item',
+        title: it.title || it.name || 'Product',
         qty: Number(it.qty || 1),
         price: toNumber(it.price || it.priceNum || 0),
         priceText: it.priceText || (it.price ? String(it.price) : ''),
@@ -105,7 +111,7 @@
       const items = (obj.items || []).map(it => ({
         key: it.key || (it.title || '') + '::' + (it.size || '') + '::' + (it.color || ''),
         id: it.id || it.title || '',
-        title: it.title || 'Item',
+        title: it.title || 'Product',
         qty: Number(it.qty || 1),
         price: toNumber(it.usd || it.price || 0),
         priceText: typeof it.price === 'string' ? it.price : (it.priceText || ''),
@@ -286,9 +292,9 @@
       // Add a black shadow class so each rendered row receives a stronger, darker shadow
       row.classList.add('shadow-black');
       const imgWrap = document.createElement('div'); imgWrap.className = 'cart-image-wrap';
-      const img = document.createElement('img'); img.src = it.image || 'images/jackbrown.jpg'; img.alt = it.title || 'Item'; img.width = 88; img.height = 88; imgWrap.appendChild(img);
+      const img = document.createElement('img'); img.src = it.image || 'images/jackbrown.jpg'; img.alt = it.title || 'Product'; img.width = 88; img.height = 88; imgWrap.appendChild(img);
       const details = document.createElement('div'); details.className = 'cart-item-details';
-      const title = document.createElement('div'); title.className = 'cart-item-title'; title.textContent = it.title || 'Item';
+      const title = document.createElement('div'); title.className = 'cart-item-title'; title.textContent = it.title || 'Product';
       const meta = document.createElement('div'); meta.className = 'cart-item-meta';
       if (it.size) {
         const s = document.createElement('span'); s.className = 'meta-size'; s.textContent = 'Size: ' + it.size; meta.appendChild(s);
@@ -481,21 +487,21 @@
         }
         if (address) { lines.push('Address: ' + (address || '').trim()); }
         lines.push('');
-        lines.push('Items:');
+        lines.push('Products:');
         let itemIndex = 1; let total = 0;
         (items || []).forEach(it => {
           const qty = Number(it.qty || 1);
           const price = Number(it.price || 0);
           const subtotal = qty * price;
           total += subtotal;
-          lines.push(`${itemIndex}. ${it.title || it.id || 'Item'} — Qty: ${qty} — Unit: ${formatCurrency(price, 2)} — Subtotal: ${formatCurrency(subtotal, 2)}`);
+          lines.push(`${itemIndex}. ${it.title || it.id || 'Product'} — Qty: ${qty} — Unit: ${formatCurrency(price, 2)} — Subtotal: ${formatCurrency(subtotal, 2)}`);
           itemIndex += 1;
         });
         lines.push('');
         lines.push('Total: ' + formatCurrency(total, 2));
         // Note: Omitted closing footer message by request
         return lines.join('\n');
-      } catch (e) { return '' + (items || []).length + ' items — Total: ' + (items || []).reduce((s,i) => s + ((i.price||0) * (i.qty||0)), 0); }
+      } catch (e) { return '' + (items || []).length + ' products — Total: ' + (items || []).reduce((s,i) => s + ((i.price||0) * (i.qty||0)), 0); }
     }
 
     // Build an image (PNG) of the invoice using canvas and product images. Returns a Promise<Blob>
@@ -540,7 +546,7 @@
             }
             // Text details
             ctx.fillStyle = '#111'; ctx.font = '20px Roboto, Arial, sans-serif';
-            ctx.fillText((itemIndex) + '. ' + (it.title || it.id || 'Item'), padding + imgW + 16, y + 30);
+            ctx.fillText((itemIndex) + '. ' + (it.title || it.id || 'Product'), padding + imgW + 16, y + 30);
             const qty = Number(it.qty || 1); const price = Number(it.price || 0); const subtotal = qty * price;
             ctx.fillStyle = '#555'; ctx.font = '18px Roboto, Arial, sans-serif';
             ctx.fillText('Qty: ' + qty + '  Unit: ' + formatCurrency(price, 2) + '  Subtotal: ' + formatCurrency(subtotal, 2), padding + imgW + 16, y + 64);
@@ -606,7 +612,7 @@
               try { doc.addImage(r.dataUrl, 'PNG', margin, cursorY, 80, 80); } catch (e) {}
             }
             const textX = margin + (r.dataUrl ? 96 : 0);
-            doc.setFontSize(12); doc.text(`${i+1}. ${r.title || 'Item'}`, textX, cursorY + 16);
+            doc.setFontSize(12); doc.text(`${i+1}. ${r.title || 'Product'}`, textX, cursorY + 16);
             doc.setFontSize(10); doc.text(`Qty: ${r.qty}  Unit: ${formatCurrency(r.price, 2)}  Subtotal: ${formatCurrency(r.subtotal, 2)}`, textX, cursorY + 36);
             cursorY += 96;
           }
@@ -1005,18 +1011,25 @@
               } else {
                 try { showCartMessage('Invoice PDF generated, saving locally...', 2000); } catch (e) {}
                 try { await saveBlobToInvoiceDB(invoiceFileName, pdfBlob); } catch (e) { console.warn('saveBlobToInvoiceDB failed', e); }
-                // If a WHATSAPP server endpoint is configured, upload the PDF and instruct server to send as a document
-                if (WHATSAPP_SERVER_SEND_URL) {
-                  try { showCartMessage('Uploading invoice to server and sending to merchant...', 0); } catch (e) {}
-                  const uploaded = await attemptSendViaServer(pdfBlob, invoiceFileName, (contact && contact.phone) ? (contact.phone) : MERCHANT_DIRECT_NUMBER);
-                  if (uploaded) {
-                    try { await deleteInvoiceFromDB(invoiceFileName); } catch (e) {}
-                    try { showCartMessage('Invoice sent successfully via server'); } catch (e) {}
-                    return; // done — no redirect
+                // Build an arranged plain-text invoice and open WhatsApp with that text.
+                // Attaching files via `wa.me` isn't supported, so we send the invoice as text.
+                try {
+                  const merchant = sanitizeMerchantNumber(MERCHANT_DIRECT_NUMBER) || sanitizeMerchantNumber(MERCHANT_WA_NUMBER) || '';
+                  const invoiceText = buildWhatsAppInvoice(items2, contact, address);
+                  const header = '#NEW ORDER FROM WEBSITE\n\n';
+                  const footer = '\n\nKindly send your details for transfer';
+                  const message = header + invoiceText + footer;
+                  if (merchant) {
+                    const waLink = 'https://wa.me/' + merchant + '?text=' + encodeURIComponent(message);
+                    try { showCartMessage('Opening WhatsApp with invoice text...', 1200); } catch (e) {}
+                    window.location.href = waLink; // redirect to WhatsApp Web / mobile
+                    return;
                   } else {
-                    try { showCartMessage('Failed to send via server — invoice saved locally for retry', 5000, 'error'); } catch (e) {}
-                    // continue to local fallback (share/clipboard/download) without redirect
+                    try { showCartMessage('Merchant number is invalid; copying invoice text to clipboard', 6000); } catch (e) {}
+                    try { await navigator.clipboard.writeText(message); try { showCartMessage('Invoice text copied to clipboard — open WhatsApp and paste', 4000); } catch (e) {} } catch (err) { console.warn('Clipboard copy failed', err); }
                   }
+                } catch (err) {
+                  console.warn('Wa.me redirect failed', err);
                 }
 
                 // Try OS share with files (mobile-focused) — does not redirect the page, but opens share sheet

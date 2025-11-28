@@ -77,25 +77,32 @@
       const fileName = `emmystore-${Date.now()}.pdf`;
       const uploadResp = await uploadBlob(blob, fileName);
       if (!uploadResp || !uploadResp.url) throw new Error('Invalid upload response');
-      LOADER.style.display = 'none';
-      LOADER.textContent = '';
-      const message = `Here's the PDF from EmmyStore: ${uploadResp.url}`;
-      const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
-      // Preferred: Navigator native share, if the user agent supports it and the app (WhatsApp) is present
-      // Note: navigator.share may not accept files in all browsers; we gracefully fallback to wa.me.
-      const fileForShare = new File([blob], fileName, { type: 'application/pdf' });
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [fileForShare] })) {
-        try {
-          await navigator.share({ files: [fileForShare], title: 'EMMYSTORE PDF', text: message });
-          return; // user shared natively
-        } catch (err) {
-          // swallow and fallback to wa.me
-          console.warn('Native share failed, falling back to wa.me:', err);
-        }
+      // After upload, redirect the user to WhatsApp (wa.me) with the uploaded file URL in the message.
+      try {
+        LOADER.textContent = 'Opening WhatsApp...';
+        LOADER.style.display = 'block';
+        const uploadedUrl = uploadResp.url;
+        if (!uploadedUrl) throw new Error('Upload returned no URL');
+        const message = `Here's the PDF from EmmyStore: ${uploadedUrl}`;
+        const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`;
+        // Give the user a short moment to see the loader, then redirect
+        setTimeout(() => {
+          try {
+            window.location.href = waUrl;
+          } catch (err) {
+            console.error('Redirect to WhatsApp failed', err);
+            LOADER.textContent = 'Redirect failed';
+            setTimeout(() => { LOADER.style.display = 'none'; LOADER.textContent = ''; }, 3000);
+          }
+        }, 250);
+        return;
+      } catch (err) {
+        console.error('Could not redirect to WhatsApp:', err);
+        LOADER.style.display = 'block';
+        LOADER.textContent = 'Redirect failed: ' + (err && err.message ? err.message : err);
+        setTimeout(() => { LOADER.style.display = 'none'; LOADER.textContent = ''; }, 5000);
+        return;
       }
-      // Open in a new tab. On mobile this will open WhatsApp app/chat if available.
-      // Final fallback — open a wa.me link prefilled with the URL text. This ensures the chat opens specifically to the requested number.
-      window.open(waUrl, '_blank');
     } catch (err) {
       alert('Error while generating or sharing PDF: ' + (err.message || err));
       LOADER.style.display = 'none';
