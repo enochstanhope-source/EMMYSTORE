@@ -30,4 +30,18 @@ If you need to programmatically send media (like PDF files) to a specific WhatsA
 - Following their message and media upload endpoints and abiding by message templates (for first-time contact)
 
 Refer to `server/whatsapp-business-template.md` for a basic example and guidance. The example is a template and requires valid account credentials.
+
+### Server-side send endpoint
+
+We added a server endpoint that attempts to send an uploaded PDF to a phone number using the WhatsApp Cloud API.
+
+- Endpoint: `POST /send-whatsapp` (JSON body)
+- Body: `{ "filename": "<filename from /upload response>", "to": "2349162919586" }` (the `to` field is optional — defaults to +2349162919586)
+- Environment variables required for real send:
+	- `WHATSAPP_TOKEN` - a valid Cloud API Bearer token
+	- `WHATSAPP_PHONE_ID` - the phone ID for your WhatsApp business number
+
+If the environment variables are not present the server will simulate a send (returns `simulated: true`) so you can test the UX without credentials.
+
+Warning: WhatsApp will only deliver messages if the recipient has previously consented and the Business API is configured correctly.
 # EMMYSTORE

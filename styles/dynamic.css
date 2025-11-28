@@ -2,6 +2,11 @@
 :root{ --bg:#f8f6f2; --card:#fff; --muted:#8b8b8b; --accent:#0f8a46; }
 *{box-sizing:border-box}
 body{font-family: 'Roboto', Arial, system-ui, sans-serif; background:var(--bg); margin:0; color:#222}
+/* Prevent pinch/double-tap zoom on this page to maintain app-like UX. Also avoid iOS auto-zoom on inputs by using >=16px font-size.
+	Accessibility tradeoffs should be considered. */
+html, body { -ms-touch-action: manipulation; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+input, textarea, select, button { font-size: 16px; -webkit-text-size-adjust: 100%; }
+img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .product-page{max-width:420px;margin:16px auto;padding-bottom:24px;opacity:1;transform:none;transition:none}
 .product-page.page-enter { opacity: 1; transform: none }
 .product-page.page-exit { opacity: 1; transform: none }

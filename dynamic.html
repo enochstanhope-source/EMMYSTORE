@@ -2,7 +2,8 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+        <!-- App-like UX: disable browser pinch/double-tap zoom on this page -->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
         <title>Product - EMMY APPAREL</title>
         <link rel="stylesheet" href="styles/dynamic.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,7 +68,26 @@
                 </section>
             </main>
         </div>
-		<script src="scripts/dynamic.js" defer></script>
+        <script src="scripts/dynamic.js" defer></script>
+        <!-- Prevent pinch/double-tap zoom (maintain app-like feel). Note accessibility tradeoffs. -->
+        <script>
+            (function () {
+                document.addEventListener('touchstart', function (e) {
+                    if (e.touches && e.touches.length > 1) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                var lastTouchEnd = 0;
+                document.addEventListener('touchend', function (e) {
+                    var now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        e.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, { passive: false });
+                try { document.addEventListener('gesturestart', function (e) { e.preventDefault(); }); } catch (err) { /* ignore */ }
+            })();
+        </script>
 		</body>
 	</html>
 

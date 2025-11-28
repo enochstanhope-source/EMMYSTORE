@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Prevent browser zoom (double-tap & pinch) for an app-like UX -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Cart — EMMY APPAREL</title>
     <link rel="stylesheet" href="styles/index.css" />
     <link rel="stylesheet" href="styles/cart.css" />
@@ -157,6 +158,32 @@
        
       </main>
       <script src="scripts/dynamic.js" defer></script>
+      <!-- Prevent pinch/double-tap zoom to preserve 'app feel' on mobile devices.
+           Note: this reduces standard browser zoom accessibility behavior. Keep in mind
+           accessibility guidelines when enabling this for production apps. -->
+      <script>
+        (function () {
+          // Prevent pinch-to-zoom (multi-touch gestures)
+          document.addEventListener('touchstart', function (e) {
+            if (e.touches && e.touches.length > 1) {
+              e.preventDefault();
+            }
+          }, { passive: false });
+
+          // Prevent double-tap-to-zoom
+          var lastTouchEnd = 0;
+          document.addEventListener('touchend', function (e) {
+            var now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+              e.preventDefault();
+            }
+            lastTouchEnd = now;
+          }, { passive: false });
+
+          // For iOS Safari / WebKit - prevent pinch-to-zoom (gesturestart event)
+          try { document.addEventListener('gesturestart', function (e) { e.preventDefault(); }); } catch (err) { /* ignore */ }
+        })();
+      </script>
   		<script>
   		// Close button: navigate back to referrer or history, fallback to home
   		(function(){

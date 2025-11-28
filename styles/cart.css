@@ -1,6 +1,10 @@
 /* cart.css — modern cart layout matching the dynamic UI color system */
 :root{ --bg:#f8f6f2; --card:#fff; --muted:#7a7a7a; --accent:#0f8a46; --primary:#b6872c; --danger:#c43; }
 *{box-sizing:border-box}
+/* Prevent default touch gestures like pinch-zoom and double-tap zoom on mobile devices
+  and ensure inputs don't auto-zoom when focused (iOS often zooms inputs < 16px). */
+html, body { -ms-touch-action: manipulation; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+input, textarea, select, .contact-field, .address-field, .qty-input { font-size: 16px; -webkit-text-size-adjust: 100%; }
 body{background:var(--bg);color:#222;font-family:'Roboto', Arial, system-ui, sans-serif}
 .cart-section{max-width:920px;margin:24px auto;padding:18px;display:grid;grid-template-columns:1fr 360px;gap:20px}
 .cart-title{font-size:20px;margin:0 0 12px;font-weight:700}

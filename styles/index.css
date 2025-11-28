@@ -71,10 +71,20 @@ body {
     overflow: hidden;
     -webkit-text-size-adjust: 100%; /* prevent mobile browser text auto-scaling */
     -ms-text-size-adjust: 100%;
+    touch-action: manipulation; /* reduces default browser gestures like pinch & double-tap zoom */
     
 }
 /* Ensure buttons and form controls always use the same UI font */
 button, input, textarea, select, a { font-family: 'Roboto', Arial, sans-serif; }
+
+/* Reduce iOS/Android auto-zoom on input focus by ensuring a 16px font-size and disabling text-size adjust.
+    Also use touch-action to keep gestures intended for the app UI instead of browser zooming.
+    Best practice: only use these settings when you want the app-like behavior and understand the accessibility tradeoffs. */
+html, body { -ms-touch-action: manipulation; touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+input, textarea, select, button, .search-input, .whatsapp-input { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+/* Make images interactive without triggering touch-based zoom gestures. */
+img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 
 :root {
     --nav-height: 90px; /* base nav height which we can use for safe-area adjustments */
