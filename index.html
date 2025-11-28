@@ -29,6 +29,31 @@
       .material-symbols-outlined {
         font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
       }
+      /* Floating WhatsApp button */
+      .floating-whatsapp {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        width: 56px;
+        height: 56px;
+        background: #25D366;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 28px rgba(37,211,102,0.18);
+        z-index: 9999;
+        text-decoration: none;
+        touch-action: none; /* allow pointer events without browser gestures */
+        cursor: grab;
+        -webkit-tap-highlight-color: transparent; /* remove grey tap highlight on mobile */
+        -webkit-user-select: none; user-select: none;
+        -webkit-user-drag: none;
+      }
+      .floating-whatsapp img { width: 28px; height: 28px; display: block; -webkit-user-drag: none; }
+      .floating-whatsapp:active, .floating-whatsapp.dragging, .floating-whatsapp:focus { background-color: #25D366 !important; opacity: 1 !important; filter: none !important; }
+      .floating-whatsapp.dragging { cursor: grabbing; transform: translateZ(0); }
+      @media (max-width:480px) { .floating-whatsapp { right: 12px; bottom: 12px; width:48px; height:48px; } .floating-whatsapp img{width:24px;height:24px;} }
     </style>
     <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
   </head>
@@ -85,13 +110,13 @@
             <input type="text" placeholder="Search" class="search-input" />
           </div>
           <div class="icons-right">
-            <button class="notif-btn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11c0-3.071-1.64-5.64-4.5-6.32V4a1.5 1.5 0 0 0-3 0v.68C7.64 5.36 6 7.929 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              <span class="notif-badge" aria-hidden="true">3</span>
-            </button>
+            <!-- Cart icon from icons/cart.svg (using <img> to reference the file) -->
+            <a class="notif-btn" href="cart.html" aria-label="Cart" aria-haspopup="true" aria-expanded="false">
+              <img src="icons/cart.svg" alt="Cart" width="20" height="20" aria-hidden="true" />
+              <span class="notif-badge" aria-hidden="false">0</span>
+            </a>
+            <!-- aria-live region for screen reader announcements when cart count changes -->
+            <div id="cart-announcer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
             <button class="hamburger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="main-menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" role="img" aria-hidden="true">
               <line class="line top" x1="3" y1="6" x2="21" y2="6"></line>
@@ -119,9 +144,9 @@
             </a>
           </li>
           <li>
-            <a href="#" class="menu-link">
+            <a href="cart.html" class="menu-link">
               <img src="icons/payicon.svg" class="menu-icon" width="20" height="20" alt="" aria-hidden="true" />
-              Checkout <span id="cart-count" class="cart-badge" aria-hidden="true">0</span>
+              Checkout <span id="cart-count" class="cart-badge" aria-hidden="false">0</span>
             </a>
           </li>
           <li>
@@ -461,10 +486,7 @@
               <input id="whatsapp-name" class="whatsapp-input" type="text" placeholder="Enter your name" aria-label="Your name" aria-required="true" />
               <div id="whatsapp-error" class="whatsapp-error" aria-live="polite" aria-atomic="true"></div>
               <button id="whatsapp-send" type="button" class="whatsapp-btn" aria-label="Subscribe via WhatsApp, opens a chat window">
-                <svg class="whatsapp-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-                  <path fill="currentColor" d="M20.52 3.48A11.92 11.92 0 0012 0C5.37 0 .04 5.33 0 12 0 14.08.51 16.06 1.46 17.8L0 24l6.42-1.34A11.94 11.94 0 0012 24c6.63 0 12-5.37 12-12 0-3.2-1.24-6.19-3.48-8.52zM12 21.7c-1.65 0-3.28-.43-4.69-1.24L6 19.94l-1.43-.38c-.92-.24-1.74-.6-2.5-1.07C2.31 17.79 1.77 14.28 1.77 12 1.77 6.76 6.76 1.77 12 1.77S22.23 6.76 22.23 12 17.24 21.7 12 21.7z"></path>
-                  <path fill="currentColor" d="M7.5 10.5c.9 2 2.7 3.5 4.6 4l1-1c.3-.3.7-.4 1.1-.2.5.2 1 0 1.4-.4.4-.4.6-.9.4-1.4-.2-.4-.1-.8.2-1.1l1-1c0 0-2.3-2.3-3.6-3.6-1.3-1.2-3.6-1.6-5.1-.5C8 7 6.7 8.5 7.5 10.5z"></path>
-                </svg>
+                <img class="whatsapp-icon" src="media icons/whatsapp.svg" width="18" height="18" alt="WhatsApp" aria-hidden="true" />
                 <span>Get updates via WhatsApp</span>
               </button>
            
@@ -529,7 +551,11 @@
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
             <a href="#">Cookie Settings</a>
-            <p href="#">Powered by - Byund technologies</p>
+            <!-- Premium built-by with a call-to-action; convert to accessible anchor for contact -->
+            <div class="footer-built" role="group" aria-label="Built by BYUND TECHNOLOGY">
+              <span class="footer-credit">Built WITH - <strong>BYUND TECHNOLOGY</strong></span>
+              <a class="btn-reach" href="https://wa.me/2349162919586" target="_blank" rel="noopener noreferrer" aria-label="Chat with BYUND TECHNOLOGY on WhatsApp">Contact Us</a>
+            </div>
           </div>
         </div>
         </footer>
@@ -537,5 +563,65 @@
     </div>
 
     <script src="scripts/index.js" defer></script>
+    <!-- Floating WhatsApp quick-chat button -->
+    <a class="floating-whatsapp" href="https://wa.me/2349162919586" target="_blank" rel="noopener" aria-label="Chat on WhatsApp" role="button">
+      <img src="media icons/whatsapp.svg" alt="WhatsApp" draggable="false" />
+    </a>
+    <script>
+      (function() {
+        const btn = document.querySelector('.floating-whatsapp');
+        if (!btn) return;
+        const key = 'floating_whatsapp_pos';
+        let dragging = false; let startX = 0, startY = 0, startLeft = 0, startTop = 0; let hasDragged = false;
+        function setPos(left, top) {
+          btn.style.left = left + 'px';
+          btn.style.top = top + 'px';
+          btn.style.right = 'auto'; btn.style.bottom = 'auto';
+        }
+        // restore saved position
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const pos = JSON.parse(raw);
+            if (typeof pos.left === 'number' && typeof pos.top === 'number') setPos(pos.left, pos.top);
+          }
+        } catch (e) {}
+        function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+        btn.addEventListener('pointerdown', function(e) {
+          if (e.button && e.button !== 0) return; // only left click
+          e.preventDefault();
+          btn.setPointerCapture(e.pointerId);
+          dragging = true; hasDragged = false; btn.classList.add('dragging');
+          startX = e.clientX; startY = e.clientY;
+          const rect = btn.getBoundingClientRect(); startLeft = rect.left; startTop = rect.top;
+        });
+        function onPointerMove(e) {
+          if (!dragging) return;
+          e.preventDefault();
+          const dx = e.clientX - startX; const dy = e.clientY - startY;
+          if (!hasDragged && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) hasDragged = true;
+          const el = btn; const w = el.offsetWidth; const h = el.offsetHeight;
+          const left = clamp(startLeft + dx, 6, window.innerWidth - w - 6);
+          const top = clamp(startTop + dy, 6, window.innerHeight - h - 6);
+          setPos(left, top);
+        }
+        function endDrag(e) {
+          if (!dragging) return;
+          try { btn.releasePointerCapture && btn.releasePointerCapture(e.pointerId); } catch (err) {}
+          dragging = false; btn.classList.remove('dragging');
+          // save position
+          const rect = btn.getBoundingClientRect();
+          try { localStorage.setItem(key, JSON.stringify({ left: rect.left, top: rect.top })); } catch (err) {}
+          // small timeout to reset click prevention
+          setTimeout(() => { hasDragged = false; }, 250);
+        }
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', endDrag);
+        document.addEventListener('pointercancel', endDrag);
+        // prevent navigation when the user dragged
+        btn.addEventListener('click', function(e) { if (hasDragged) { e.preventDefault(); e.stopImmediatePropagation(); hasDragged = false; } });
+        // Ensure keyboard focus still allows opening the chat - keyboard users won't drag
+      })();
+    </script>
   </body>
 </html>

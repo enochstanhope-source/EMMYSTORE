@@ -577,7 +577,8 @@ body.light-bg { background: linear-gradient(180deg, rgba(255,255,255,1), rgba(25
     position: fixed;
     right: 18px;
     bottom: 18px;
-    background: rgba(0,0,0,0.86);
+    /* Brown gradient to match theme */
+    background: linear-gradient(180deg, #b6872c, #a0671d);
     color: #fff;
     padding: 8px 12px;
     border-radius: 8px;
@@ -591,6 +592,27 @@ body.light-bg { background: linear-gradient(180deg, rgba(255,255,255,1), rgba(25
 .cart-toast.visible {
     opacity: 1;
     transform: translateY(0);
+}
+/* Flying clone that animates from product image to the cart */
+.fly-img {
+    position: fixed;
+    pointer-events: none;
+    z-index: 99999;
+    will-change: transform, opacity;
+    transition: transform 720ms cubic-bezier(.22,.9,.36,1), opacity 720ms ease;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Small pop animation for the header badge when an item lands */
+.notif-badge.pop {
+    transform-origin: center;
+    animation: badge-pop 300ms cubic-bezier(.2,.8,.2,1);
+}
+@keyframes badge-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.4); }
+    100% { transform: scale(1); }
 }
 .menu-link:hover, .menu-link:focus { background: var(--active-bg); transform: translateX(-4px); outline: none; color: var(--text-color); }
 
@@ -1217,7 +1239,7 @@ button:hover, button:focus, button:active,
     flex-direction: column;
     scroll-snap-align: start;
     flex: 0 0 auto; /* prevent shrinking so horizontal scroll behaves consistently */
-    border: 1px solid #ff9736; /* 1px solid black border as requested */
+    border: 1px solid #dbd8d6; /* 1px solid black border as requested */
     background: transparent !important; /* keep only image */
     /* subtle default black shadow to ground the card; user requested 'black box shadow' */
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.26);
@@ -1405,11 +1427,32 @@ button:hover, button:focus, button:active,
     cursor: pointer;
     font-weight: 700;
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.36);
-    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 220ms ease, color 220ms ease;
 }
 .price-add-btn svg { fill: #fff; }
 .price-add-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.48); }
 .price-add-btn:active { transform: scale(0.98); }
+
+/* Pressed / clicked state: show grey background while processing add-to-cart */
+.price-add-btn.pressed {
+    background: #d6d6d6; /* light grey */
+    color: #222;
+    box-shadow: none;
+}
+
+/* Ensure focus for 'add to cart' is visible but doesn't override the pressed state with grey
+   (the generic button:focus rule sets all buttons to var(--active-bg)). When the button is not
+   in .pressed state, keep the primary gradient; use focus-visible for keyboard accessibility */
+.price-add-btn:focus:not(.pressed) {
+    background: linear-gradient(135deg, #e6781e 0%, #000 100%);
+    color: #fff;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.36);
+    outline: none;
+}
+.price-add-btn:focus-visible {
+    outline: 3px solid rgba(205,162,79,0.18);
+    outline-offset: 4px;
+}
 
 /* Product Description & Ratings */
 .card-footer { padding: 8px 12px; display:flex; flex-direction: column; gap: 8px; align-items: flex-start; background: transparent; }
@@ -2011,6 +2054,7 @@ button:hover, button:focus, button:active,
     flex-wrap: wrap;
     justify-content: center;
     gap: 16px;
+    align-items: center;
 }
 
 @media (min-width: 769px) {
@@ -2034,6 +2078,51 @@ button:hover, button:focus, button:active,
     outline: 2px solid rgba(205,162,79,0.3);
     outline-offset: 2px;
     border-radius: 2px;
+}
+
+/* Premium footer credit */
+.footer-built {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: #bdbdbd;
+}
+.footer-built .footer-credit {
+    font-family: 'Poppins', 'Roboto', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: white;
+    font-size: 12px;
+}
+.footer-built .footer-credit strong {
+    font-weight: 700;
+    color: var(--lux-accent);
+    text-shadow: 0 6px 18px rgba(198,150,90,0.08);
+}
+.footer-bottom-links .btn-reach {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgb(43, 134, 156), rgb(52, 91, 146));
+    color: #fff;
+    text-decoration: none;
+    font-weight: 400;
+    border: none;
+    box-shadow: 0 10px 30px rgba(3,102,214,0.14);
+    transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+}
+.footer-bottom-links .btn-reach:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(3,102,214,0.18); }
+.footer-bottom-links .btn-reach:active { transform: translateY(-1px); }
+.footer-bottom-links .btn-reach:focus-visible { outline: 3px solid rgba(0,123,255,0.22); outline-offset: 4px; }
+
+@media (max-width: 768px) {
+    .footer-built { gap: 8px; text-align: center; justify-content: center; }
+    .footer-built .footer-credit { font-size: 12px; }
+    .footer-bottom-links { gap: 12px; }
 }
 
 @media (min-width: 769px) {

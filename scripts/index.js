@@ -241,6 +241,8 @@ navButtons.forEach((button, index) => {
 
 // Price add buttons (left of price)
 const priceAddBtns = document.querySelectorAll('.price-add-btn');
+// Duration to show '.pressed' visual feedback in milliseconds (1.2s as requested)
+const PRESSED_TIMEOUT_MS = 1200;
 // Lightweight cart model using product title and USD price from the DOM only.
 const cart = {
     items: [], // { title, usd, qty }
@@ -249,28 +251,102 @@ const cart = {
 };
 
 function updateCartUI() {
+    // Update header badge
+    const headerBadge = document.querySelector('.notif-btn .notif-badge');
+    if (headerBadge) {
+        headerBadge.textContent = String(cart.count);
+        // Always show the badge even when count is 0 so it reads '0' when empty
+        try { headerBadge.style.display = ''; } catch (err) {}
+        try { headerBadge.removeAttribute('aria-hidden'); } catch (err) {}
+    }
+    // Update off-canvas nav badge
     const badge = document.getElementById('cart-count');
     if (badge) {
         badge.textContent = String(cart.count);
+        try { badge.style.display = ''; } catch (err) {}
+        try { badge.removeAttribute('aria-hidden'); } catch (err) {}
     }
+    // Persist cart to localStorage
+    try { localStorage.setItem('emmystore_cart', JSON.stringify(cart)); } catch (err) { /* ignore */ }
+    // Announce to screen readers the updated cart count
+    try {
+        const announcer = document.getElementById('cart-announcer');
+        if (announcer) {
+            announcer.textContent = cart.count > 0 ? `${cart.count} item${cart.count > 1 ? 's' : ''} in your cart` : 'Your cart is empty';
+        }
+    } catch (err) { /* ignore */ }
 }
 
-function addItemToCart(title, usdPrice) {
+function addItemToCart(title, usdPrice, opts) {
+    // opts: { id, image, priceText, key, size, color }
+    opts = opts || {};
     // Ensure we have numbers
     const usd = (typeof usdPrice === 'number') ? usdPrice : parseFloat(usdPrice) || 0;
-    const found = cart.items.find(i => i.title === title);
+    // Create a stable key to allow grouping same product/variant
+    const key = opts.key || (opts.id ? String(opts.id) + '::' + (opts.size || '') + '::' + (opts.color || '') : title);
+    // Try to find an existing item by key (prefer) then by title as fallback
+    let found = cart.items.find(i => i.key && i.key === key);
+    if (!found) found = cart.items.find(i => i.title === title && (!i.key));
+
     if (found) {
         found.qty += 1;
     } else {
-        cart.items.push({ title, usd, qty: 1 });
+        const item = {
+            key: key,
+            id: opts.id || (title ? title.toLowerCase().replace(/\s+/g,'-') : undefined),
+            title: title,
+            usd: usd,
+            priceText: opts.priceText || undefined,
+            image: opts.image || '',
+            size: opts.size || undefined,
+            color: opts.color || undefined,
+            qty: 1
+        };
+        cart.items.push(item);
     }
     cart.count += 1;
     cart.totalUSD = cart.items.reduce((s, it) => s + (it.usd * it.qty), 0);
     updateCartUI();
+    // Persist after modification
+    try { localStorage.setItem('emmystore_cart', JSON.stringify(cart)); } catch (err) { /* ignore */ }
 }
+
+// Load cart from localStorage (if present) when script initializes
+(function initCartFromStorage() {
+    try {
+        const raw = localStorage.getItem('emmystore_cart');
+        if (!raw) return;
+        const stored = JSON.parse(raw);
+        if (!stored) return;
+        cart.items = Array.isArray(stored.items) ? stored.items : [];
+        cart.count = typeof stored.count === 'number' ? stored.count : (cart.items.reduce((s,it) => s + (it.qty || 0), 0) || 0);
+        cart.totalUSD = typeof stored.totalUSD === 'number' ? stored.totalUSD : (cart.items.reduce((s, it) => s + (it.usd * it.qty), 0) || 0);
+    } catch (err) {
+        // ignore parse errors
+    }
+    updateCartUI();
+})();
 priceAddBtns.forEach(btn => {
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
+        // 'Pressed' visual state: show grey background during add action
+        this.classList.add('pressed');
+        // Track whether this click was a pointer interaction (mouse/touch).
+        // If so, we'll remove focus at the end of the pressed timeout — this ensures the
+        // :focus rules don't keep the button looking 'active' after the pressed state ends.
+        const wasPointer = !!(e && typeof e.detail === 'number' && e.detail !== 0);
+        if (this._pressedTimer) clearTimeout(this._pressedTimer);
+        this._pressedTimer = setTimeout(() => {
+            this.classList.remove('pressed');
+            // Blurring at the end prevents :focus from keeping gray background while
+            // keyboard users still retain focus behavior (we don't blur for keyboard)
+            if (wasPointer) {
+                try { this.blur && this.blur(); } catch (err) { /* ignore */ }
+            }
+            this._pressedTimer = null;
+        }, PRESSED_TIMEOUT_MS);
+
+        // Spring animation (visual bounce)
         this.classList.remove('spring-anim-small');
         void this.offsetWidth;
         this.classList.add('spring-anim-small');
@@ -279,6 +355,10 @@ priceAddBtns.forEach(btn => {
         if (!card) return;
         const titleEl = card.querySelector('.card-title');
         const priceEl = card.querySelector('.price-text, .price');
+        const imgEl = card.querySelector('img');
+        let imgSrc = imgEl ? imgEl.getAttribute('src') : '';
+        if (imgSrc) imgSrc = imgSrc.replace(/^\.\//, '');
+        const productId = card.dataset.productId || (titleEl ? titleEl.textContent.trim().toLowerCase().replace(/\s+/g,'-') : undefined);
         const title = titleEl ? titleEl.textContent.trim() : 'Item';
         let usdValue = 0;
         if (priceEl) {
@@ -287,7 +367,7 @@ priceAddBtns.forEach(btn => {
             const m = txt.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
             usdValue = m ? parseFloat(m[0]) : 0;
         }
-        addItemToCart(title, usdValue);
+        addItemToCart(title, usdValue, { id: productId, image: imgSrc, priceText: priceEl ? priceEl.textContent.trim() : undefined });
         // Optional: briefly flash a tiny confirmation (use title and price for UX)
         try {
             // Create a non-invasive toast that disappears
@@ -299,6 +379,51 @@ priceAddBtns.forEach(btn => {
             setTimeout(() => { toast.classList.remove('visible'); setTimeout(() => toast.remove(), 300); }, 2000);
         } catch (err) {
             // ignore
+        }
+        // Flying image animation: clone the product image and animate to cart
+        try {
+            const img = card.querySelector('img');
+            const cartBtnImg = document.querySelector('.notif-btn img') || document.querySelector('.notif-btn');
+            if (img && cartBtnImg) {
+                const imgRect = img.getBoundingClientRect();
+                const cartRect = cartBtnImg.getBoundingClientRect();
+                const fly = img.cloneNode(true);
+                fly.className = 'fly-img';
+                // Set initial position and size (use fixed positioning)
+                fly.style.left = `${imgRect.left}px`;
+                fly.style.top = `${imgRect.top}px`;
+                fly.style.width = `${imgRect.width}px`;
+                fly.style.height = `${imgRect.height}px`;
+                fly.style.opacity = '1';
+                document.body.appendChild(fly);
+                // Force reflow
+                fly.getBoundingClientRect();
+                // Compute center-to-center delta
+                const srcCx = imgRect.left + imgRect.width / 2;
+                const srcCy = imgRect.top + imgRect.height / 2;
+                const dstCx = cartRect.left + cartRect.width / 2;
+                const dstCy = cartRect.top + cartRect.height / 2;
+                const dx = dstCx - srcCx;
+                const dy = dstCy - srcCy;
+                // Scale to a much smaller size (cart icon) - keep aspect ratio
+                const scale = Math.min(0.25, (cartRect.width / imgRect.width) * 0.9);
+                // Animate
+                requestAnimationFrame(() => {
+                    fly.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+                    fly.style.opacity = '0.55';
+                });
+                // When animation completes — remove the clone and animate badge
+                fly.addEventListener('transitionend', function () {
+                    try { fly.remove(); } catch (e) {}
+                    const headerBadge = document.querySelector('.notif-btn .notif-badge');
+                    if (headerBadge) {
+                        headerBadge.classList.add('pop');
+                        setTimeout(() => headerBadge.classList.remove('pop'), 300);
+                    }
+                }, { once: true });
+            }
+        } catch (err) {
+            // ignore animation errors
         }
     });
 });
@@ -381,13 +506,17 @@ if (buyNowBtn) {
         const titleEl = firstCard.querySelector('.card-title');
         const priceEl = firstCard.querySelector('.price-text, .price');
         const title = titleEl ? titleEl.textContent.trim() : 'Item';
+        const imgEl = firstCard.querySelector('img');
+        let imgSrc = imgEl ? imgEl.getAttribute('src') : '';
+        if (imgSrc) imgSrc = imgSrc.replace(/^\.\//, '');
+        const productId = firstCard.dataset.productId || (titleEl ? titleEl.textContent.trim().toLowerCase().replace(/\s+/g,'-') : undefined);
         let usdValue = 0;
         if (priceEl) {
             const txt = priceEl.textContent || priceEl.innerText || '';
             const m = txt.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
             usdValue = m ? parseFloat(m[0]) : 0;
         }
-        addItemToCart(title, usdValue);
+        addItemToCart(title, usdValue, { id: productId, image: imgSrc, priceText: priceEl ? priceEl.textContent.trim() : undefined });
         try {
             alert(`Buy now: ${title} — total (USD) $${usdValue}`);
         } catch (e) { console.log('buy now', title, usdValue); }
