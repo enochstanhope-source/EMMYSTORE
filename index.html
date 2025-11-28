@@ -30,6 +30,7 @@
         font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
       }
     </style>
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js" defer></script>
   </head>
   <body>
     <!-- SVG Icons Library -->
@@ -449,16 +450,25 @@
         </section>
 
         <!-- Footer (moved inside main-content so it scrolls with the page) -->
-        <footer class="footer">
+        <footer class="footer" role="contentinfo" aria-label="EMMYSTORE Footer" style="padding-bottom: 80px;">
         <div class="footer-content">
           <!-- Newsletter Section -->
           <div class="footer-section newsletter-section">
-            <h4>Stay Updated</h4>
-            <p>Subscribe to get special offers and updates delivered to your inbox.</p>
-            <form class="newsletter-form" aria-label="Newsletter subscription">
-              <input type="email" placeholder="Enter your email" class="newsletter-input" required />
-              <button type="submit" class="newsletter-btn">Subscribe</button>
-            </form>
+            <h4>WhatsApp Subscribe</h4>
+            <p>Subscribe via WhatsApp to get special offers, order updates, and stay updated on new releases.</p>
+            <div class="newsletter-form whatsapp-form" aria-label="WhatsApp subscription">
+              <label for="whatsapp-name" class="visually-hidden">Your name</label>
+              <input id="whatsapp-name" class="whatsapp-input" type="text" placeholder="Enter your name" aria-label="Your name" aria-required="true" />
+              <div id="whatsapp-error" class="whatsapp-error" aria-live="polite" aria-atomic="true"></div>
+              <button id="whatsapp-send" type="button" class="whatsapp-btn" aria-label="Subscribe via WhatsApp, opens a chat window">
+                <svg class="whatsapp-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
+                  <path fill="currentColor" d="M20.52 3.48A11.92 11.92 0 0012 0C5.37 0 .04 5.33 0 12 0 14.08.51 16.06 1.46 17.8L0 24l6.42-1.34A11.94 11.94 0 0012 24c6.63 0 12-5.37 12-12 0-3.2-1.24-6.19-3.48-8.52zM12 21.7c-1.65 0-3.28-.43-4.69-1.24L6 19.94l-1.43-.38c-.92-.24-1.74-.6-2.5-1.07C2.31 17.79 1.77 14.28 1.77 12 1.77 6.76 6.76 1.77 12 1.77S22.23 6.76 22.23 12 17.24 21.7 12 21.7z"></path>
+                  <path fill="currentColor" d="M7.5 10.5c.9 2 2.7 3.5 4.6 4l1-1c.3-.3.7-.4 1.1-.2.5.2 1 0 1.4-.4.4-.4.6-.9.4-1.4-.2-.4-.1-.8.2-1.1l1-1c0 0-2.3-2.3-3.6-3.6-1.3-1.2-3.6-1.6-5.1-.5C8 7 6.7 8.5 7.5 10.5z"></path>
+                </svg>
+                <span>Get updates via WhatsApp</span>
+              </button>
+           
+            </div>
           </div>
 
           <!-- Links Sections -->
@@ -466,53 +476,49 @@
             <div class="footer-section">
               <h5>Shop</h5>
               <ul class="footer-links">
-                <li><a href="#">New Arrivals</a></li>
-                <li><a href="#">Best Sellers</a></li>
-                <li><a href="#">Collections</a></li>
-                <li><a href="#">Sale</a></li>
+                <li><a href="#">- Collections</a></li>
+                <li><a href="#">- Best Sellers</a></li>
+                <li><a href="#">- Sale</a></li>
+         
               </ul>
             </div>
 
             <div class="footer-section">
               <h5>Support</h5>
               <ul class="footer-links">
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#">Shipping Info</a></li>
-                <li><a href="#">Returns</a></li>
-                <li><a href="#">FAQ</a></li>
+                <li><a href="#">- Contact Us</a></li>
+                <li><a href="#">- Shipping info</a></li>
+                <li><a href="#">- Returns</a></li>
+                <li><a href="#">- FAQ</a></li>
               </ul>
             </div>
 
             <div class="footer-section">
               <h5>Company</h5>
               <ul class="footer-links">
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Careers</a></li>
-                <li><a href="#">Press</a></li>
-                <li><a href="#">Blog</a></li>
+                <li><a href="#">- About Us</a></li>
+                <li><a href="#">- Business</a></li>
+               
+             
               </ul>
             </div>
           </div>
         </div>
 
-        <!-- Social Links -->
+        <!-- Social Links - use available files in the "media icons" folder -->
         <div class="footer-social">
-          <a href="#" class="social-link" aria-label="Follow on Twitter">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 9-1.5 9-5.5v-.5a7.7 7.7 0 002-3.5z"></path>
-            </svg>
+          <p>Connect With Us</p>
+          <a href="#" class="social-link" aria-label="Follow on X (Twitter)">
+            <video class="social-video" src="media icons/X.mp4" autoplay muted loop playsinline aria-hidden="true" width="40" height="40" style="object-fit:cover;border-radius:6px;display:block;"></video>
+          </a>
+          <a href="#" class="social-link social-link--tiktok" aria-label="Follow on TikTok">
+            <lottie-player class="social-tiktok" src="media icons/tiktok.json" background="transparent" speed="1" loop autoplay aria-hidden="true"></lottie-player>
           </a>
           <a href="#" class="social-link" aria-label="Follow on Instagram">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"></path>
-              <circle cx="17.5" cy="6.5" r="1.5"></circle>
-            </svg>
+            <lottie-player class="social-instagram" src="media icons/instagram%20%281%29.json" background="transparent" speed="1" loop autoplay aria-hidden="true"></lottie-player>
           </a>
           <a href="#" class="social-link" aria-label="Follow on Facebook">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18 2h-3a6 6 0 00-6 6v3H7v4h2v8h4v-8h3l1-4h-4V8a2 2 0 012-2h3z"></path>
-            </svg>
+            <lottie-player class="social-facebook" src="media icons/facebook.json" background="transparent" speed="1" loop autoplay aria-hidden="true"></lottie-player>
           </a>
         </div>
 
@@ -523,6 +529,7 @@
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
             <a href="#">Cookie Settings</a>
+            <p href="#">Powered by - Byund technologies</p>
           </div>
         </div>
         </footer>

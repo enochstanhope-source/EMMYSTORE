@@ -30,6 +30,99 @@ categoryButtons.forEach(button => {
     }
 });
 
+// WhatsApp subscribe: build wa.me link including entered name and open chat
+(function() {
+    const phone = '2349162919586'; // international format (no +)
+    const nameInput = document.getElementById('whatsapp-name');
+    const sendBtn = document.getElementById('whatsapp-send');
+    if (!sendBtn) return;
+
+    function setError(msg) {
+        const err = document.getElementById('whatsapp-error');
+        if (!err) return;
+        // Clear any existing auto-hide timer whenever we update the error
+        if (err._autoHideTimer) {
+            clearTimeout(err._autoHideTimer);
+            err._autoHideTimer = null;
+        }
+        if (msg) {
+            err.textContent = msg;
+            err.classList.add('visible');
+            err.dataset.visible = 'true';
+            // Auto-hide after 2.5 seconds
+            err._autoHideTimer = setTimeout(() => {
+                err.textContent = '';
+                err.classList.remove('visible');
+                err.dataset.visible = 'false';
+                err._autoHideTimer = null;
+            }, 2500);
+        } else {
+            err.textContent = '';
+            err.classList.remove('visible');
+            err.dataset.visible = 'false';
+        }
+    }
+
+    function sendWhatsApp() {
+        const name = nameInput ? nameInput.value.trim() : '';
+        if (!name) {
+            setError('Please enter your name before subscribing.');
+            if (nameInput) {
+                nameInput.setAttribute('aria-invalid', 'true');
+                nameInput.focus();
+            }
+            return;
+        }
+        setError('');
+        if (nameInput) nameInput.setAttribute('aria-invalid', 'false');
+        const message = `Hi, my name is ${name}. Please subscribe me to offers and updates.`;
+        const url = `https://wa.me/${phone}?text=` + encodeURIComponent(message);
+        // Open in new tab where allowed
+        try { window.open(url, '_blank'); }
+        catch (err) { window.location.href = url; }
+        // Clear the input after attempting to open WhatsApp so the UI resets for the next use
+        try {
+            if (nameInput) {
+                nameInput.value = '';
+                // remove invalid state and blur to show the input has been handled
+                nameInput.setAttribute('aria-invalid', 'false');
+                nameInput.blur && nameInput.blur();
+            }
+        } catch (err) { /* ignore */ }
+    }
+
+    sendBtn.addEventListener('click', function() {
+        // If there's no name entered, toggle the error message: hide if visible, show if hidden
+        const err = document.getElementById('whatsapp-error');
+        const name = nameInput ? nameInput.value.trim() : '';
+        if (!name && err) {
+            // If error is currently visible, hide it immediately (toggle behavior)
+            if (err.classList.contains('visible') || err.dataset.visible === 'true') {
+                setError('');
+                return;
+            }
+            // otherwise show the error (auto-hides after 2.5s)
+            setError('Please enter your name before subscribing.');
+            if (nameInput) {
+                nameInput.setAttribute('aria-invalid', 'true');
+                nameInput.focus();
+            }
+            return;
+        }
+
+        sendWhatsApp();
+    });
+
+    if (nameInput) {
+        nameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendWhatsApp();
+            }
+        });
+    }
+})();
+
 // Fallback: ensure any 'Home' menu links always scroll to top and close the menu
 (function() {
     const homeLinks = document.querySelectorAll('.menu-link[data-action="home"]');

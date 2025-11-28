@@ -4,6 +4,51 @@
     box-sizing: border-box;
 }
 
+/* Footer social icons: give animated icons a consistent black background */
+.footer-social {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 0 6px;
+}
+.footer-social .social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent; /* allow footer gradient to show through */
+    padding: 0; /* no separate box so it visually merges */
+    border-radius: 50%;
+    box-shadow: none;
+    border: none;
+}
+.footer-social video.social-video,
+.footer-social lottie-player {
+    width: 40px;
+    height: 40px;
+    display: block;
+    border-radius: 50%;
+    background: transparent;
+}
+.footer-social lottie-player { overflow: hidden; }
+
+.social-link--tiktok {
+    width: 96px; /* slightly larger emphasis for TikTok */
+    height: 96px;
+}
+.footer-social lottie-player.social-tiktok {
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 420px) {
+    .footer-social { gap: 8px; padding: 10px 0; }
+    .footer-social .social-link { padding: 4px; }
+    .footer-social video.social-video, .footer-social lottie-player { width: 36px; height: 36px; }
+    .social-link--tiktok { width: 64px; height: 64px; }
+    .footer-social lottie-player.social-tiktok { width: 100%; height: 100%; }
+}
+
 /* Keep the scrollbar gutter reserved to avoid layout shift when overlays open */
 html {
     scrollbar-gutter: stable;
@@ -86,10 +131,11 @@ body {
     /* glass header to match luxury background */
     background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.92));
     padding: 18px 20px; /* slightly taller to make room for border */
-    border-bottom: 1px solid rgba(0, 0, 0, 0.411); /* prominent brand accent */
+    border-bottom: 1px solid rgba(216, 97, 0, 0); /* prominent brand accent */
         color: #1a1a1a;
         font-weight: 800;
     display: flex;
+    box-shadow: 0 2px 8px rgb(255, 255, 255);
     flex-direction: column;
     align-items: flex-start;
     position: sticky; /* keep header fixed at the top */
@@ -508,6 +554,7 @@ body {
     transition: opacity 220ms ease, transform 220ms ease;
     z-index: 9999;
 }
+
 .cart-toast.visible {
     opacity: 1;
     transform: translateY(0);
@@ -552,21 +599,27 @@ button:hover, button:focus, button:active,
     flex-direction: column;
     overflow-y: auto;
     overflow-x: hidden;
-    /* Keep only a small bottom padding so content reaches the viewport edge without extra blank space. */
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    /* Bottom padding moved to the footer so the safe-area uses footer background. */
+    padding-bottom: 0;
     scroll-behavior: smooth;
+    /* Make the main content background solid white so the bottom padding looks uniformly white */
+    background: #ffffff;
+    /* Hide vertical scrollbars visually while keeping scroll functional across browsers */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
 
 .main-content::-webkit-scrollbar {
-    width: 6px;
+    width: 0px; /* hide WebKit scrollbars visually (Chrome, Safari) */
+    height: 0px;
 }
 
 .main-content::-webkit-scrollbar-track {
-    background: transparent;
+    background: transparent; /* keep track transparent */
 }
 
 .main-content::-webkit-scrollbar-thumb {
-    background: #ddd;
+    background: transparent; /* make thumb transparent when hidden */
     border-radius: 3px;
     transition: background 0.3s ease;
 }
@@ -709,9 +762,9 @@ button:hover, button:focus, button:active,
 /* Categories Section */
 .categories-section {
     padding: 12px 12px 8px; /* reduce padding for a thinner section */
-    background: linear-gradient(180deg,#807e7e, #e6781e54);
+    background: linear-gradient(180deg,#807e7e, #fafafa54);
     
-    margin: 8px 12px 0 12px; /* slightly less vertical space */
+    margin: 0px 12px 0 12px; /* slightly less vertical space */
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.06);
     box-shadow: 0 10px 28px rgba(0,0,0,0.28); /* stronger black shadow for visual separation */
@@ -768,6 +821,7 @@ button:hover, button:focus, button:active,
     padding-bottom: 6px; /* slightly less, matches reduced section bottom padding */
     scroll-behavior: smooth;
     align-items: center;
+    justify-content: center; /* center items horizontally when possible */
     scroll-snap-type: x mandatory; /* snap so buttons align when scrolling */
     position: relative; /* required for ::after fade mask */
     -webkit-overflow-scrolling: touch;
@@ -781,10 +835,12 @@ button:hover, button:focus, button:active,
 }
 
 @media (max-width: 420px) {
-    .category-avatar { width: 36px; height: 36px; }
-    .category-btn { padding: 6px 8px; gap: 6px; }
-    .category-btn span { font-size: 11px; }
-    .categories-section { padding: 10px 12px 6px; }
+    .category-avatar { width: 32px; height: 32px; }
+    .category-btn { padding: 4px 6px; gap: 4px; }
+    .category-btn span { font-size: 10px; }
+    .categories-section { padding: 6px 10px 4px; margin: 0 8px; }
+    .categories-section h3 { font-size: 14px; margin-bottom: 6px; }
+    .categories-container { gap: 8px; padding: 2px 8px 2px 10px; }
 }
 
 .categories-container::-webkit-scrollbar {
@@ -1416,8 +1472,8 @@ button:hover, button:focus, button:active,
 /* Hide bottom nav on larger desktop screens and reduce bottom padding */
 @media (min-width: 1024px) {
     .bottom-nav { display: none; }
-    /* Reduce bottom padding because nav is hidden so there's no need for extra spacing */
-    .main-content { padding-bottom: 24px; }
+    /* Reduce bottom padding for large desktop (keep a minimum of 30px including safe area) */
+    .main-content { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 30px); }
 }
 
 .nav-btn {
@@ -1589,18 +1645,18 @@ button:hover, button:focus, button:active,
     }
 }
 
-/* Footer Styles */
+/* Footer Styles: luxury dark theme with gold accents */
 .footer {
-    background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.92));
-    border-top: 1px solid rgba(255,255,255,0.06);
-    padding: 40px 20px 24px;
-    color: #1a1a1a;
+    background: linear-gradient(180deg, rgba(179, 176, 172, 0.96), rgba(0, 0, 0, 0.98));
+    border-top: 1px solid rgba(182,135,44,0.10);
+    padding: 40px 20px calc(env(safe-area-inset-bottom, 0px) + 24px);
+    color: #fff;
     margin-top: 32px;
 }
 
 @media (min-width: 769px) {
     .footer {
-        padding: 48px 32px 28px;
+        padding: 48px 32px calc(env(safe-area-inset-bottom, 0px) + 28px);
     }
 }
 
@@ -1611,10 +1667,10 @@ button:hover, button:focus, button:active,
 
 /* Newsletter Section */
 .newsletter-section {
-    background: linear-gradient(135deg, rgba(205,162,79,0.08), rgba(205,162,79,0.04));
+    background: linear-gradient(135deg, rgba(36, 33, 27, 0.664), rgba(65, 54, 54, 0.904));
     padding: 24px;
     border-radius: 16px;
-    border: 1px solid rgba(205,162,79,0.1);
+    border: 1px solid rgba(182,135,44,0.06);
     margin-bottom: 32px;
     text-align: center;
 }
@@ -1628,14 +1684,14 @@ button:hover, button:focus, button:active,
 
 .newsletter-section h4 {
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 600;
     margin-bottom: 8px;
-    color: #0d0d0d;
+    color: #ffffff;
 }
 
 .newsletter-section p {
     font-size: 14px;
-    color: #666;
+    color: rgba(197, 194, 194, 0.85);
     margin-bottom: 16px;
     line-height: 1.5;
 }
@@ -1657,30 +1713,30 @@ button:hover, button:focus, button:active,
 .newsletter-input {
     flex: 1;
     padding: 12px 16px;
-    border: 1px solid rgba(0,0,0,0.08);
+    border: 1px solid rgba(255,255,255,0.06);
     border-radius: 12px;
-    background: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.04);
     font-size: 14px;
     font-family: 'Poppins', sans-serif;
-    color: #1a1a1a;
+    color: #fff;
     transition: all 0.3s ease;
 }
 
 .newsletter-input::placeholder {
-    color: #999;
+    color: rgba(117, 112, 112, 0.6);
 }
 
 .newsletter-input:focus {
     outline: none;
     border-color: rgba(205,162,79,0.3);
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(205,162,79,0.08);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 0 4px rgba(205,162,79,0.06);
 }
 
 .newsletter-btn {
     padding: 12px 28px;
-    background: linear-gradient(180deg, var(--lux-accent), #b6872c);
-    color: #fff;
+    background: linear-gradient(90deg, var(--header-accent), #558b0f);
+    color: #152118;
     border: none;
     border-radius: 12px;
     font-size: 14px;
@@ -1701,6 +1757,67 @@ button:hover, button:focus, button:active,
     transform: translateY(0);
 }
 
+.whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: linear-gradient(90deg, var(--header-accent), #258d10);
+    color: #152118;
+    border-radius: 999px; /* pill */
+    text-decoration: none;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    border: none; /* ensure no border */
+    box-shadow: 0 8px 22px rgba(182,135,44,0.12);
+    transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+    cursor: pointer;
+}
+.whatsapp-btn:hover {
+    transform: translateY(-3px);
+    filter: brightness(0.98);
+    /* subtle elevation on hover */
+    box-shadow: 0 10px 26px rgba(37, 211, 102, 0.12);
+}
+.whatsapp-note {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+.whatsapp-error {
+    color: #e7342e; /* bootstrap danger red */
+    font-size: 13px;
+    margin-top: 6px;
+    display: none; /* show only when it has text */
+}
+.whatsapp-error.visible { display: block; }
+
+.whatsapp-icon { width:18px; height:18px; display:block; color:#fff; }
+.whatsapp-btn svg.whatsapp-icon path { fill: currentColor; }
+.whatsapp-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.18); outline-offset: 3px; }
+
+/* WhatsApp input styling */
+.whatsapp-input {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: rgba(235, 228, 228, 0.9);
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+}
+
+@media (min-width: 769px) {
+    .whatsapp-input { margin-right: 12px; margin-bottom: 0; }
+    .whatsapp-form { display: flex; align-items: center; gap: 8px; }
+}
+
+.visually-hidden { position: absolute !important; height: 1px; width: 1px; overflow: hidden; clip: rect(1px, 1px, 1px, 1px); white-space: nowrap; }
+
+
 /* Footer Links Grid */
 .footer-links-grid {
     display: grid;
@@ -1717,11 +1834,12 @@ button:hover, button:focus, button:active,
 
 .footer-section h5 {
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #0d0d0d;
+    color: #fff5c6cc;
     margin-bottom: 16px;
+    font-family: Roboto, arial;
 }
 
 .footer-links {
@@ -1733,7 +1851,7 @@ button:hover, button:focus, button:active,
 
 .footer-links li a {
     font-size: 14px;
-    color: #666;
+    color: #cec8c8;
     text-decoration: none;
     transition: all 0.3s ease;
     display: inline-block;
@@ -1759,6 +1877,8 @@ button:hover, button:focus, button:active,
     padding: 24px 0;
     border-top: 1px solid rgba(0,0,0,0.06);
     border-bottom: 1px solid rgba(0,0,0,0.06);
+    flex-wrap: wrap; /* allow the heading to be on a dedicated row above the icons */
+    align-items: center;
 }
 
 @media (min-width: 769px) {
@@ -1772,7 +1892,7 @@ button:hover, button:focus, button:active,
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(205,162,79,0.08);
+    background: rgba(238, 203, 133, 0.829);
     border: 1px solid rgba(205,162,79,0.12);
     display: flex;
     align-items: center;
@@ -1797,6 +1917,39 @@ button:hover, button:focus, button:active,
 .social-link:focus {
     outline: 2px solid rgba(205,162,79,0.3);
     outline-offset: 2px;
+}
+
+/* Keep the heading paragraph above the icons inside the flex row */
+.footer-social > p {
+    order: -1; /* move to top */
+    display: block; /* explicit block-level behavior */
+    flex: 0 0 100%; /* take the full width of the flex container */
+    width: 100%;
+    text-align: center;
+  
+    color: rgba(255,255,255,0.92);
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Ensure the heading behaves like a proper block inside the flex container */
+.footer-social p {
+    display: block; /* explicit block behavior */
+    flex-basis: 100%; /* take the full row inside the flex container */
+}
+
+/* Override for TikTok to ensure it remains larger than other social icons */
+.footer-social .social-link--tiktok {
+    width: 96px; /* bring down a bit from 120 */
+    height: 96px;
+    overflow: visible;
+    margin-top: 6px; /* nudge down a bit for baseline alignment */
+}
+.footer-social lottie-player.social-tiktok { width: 100%; height: 100%; transform: scale(1.35); transform-origin: center; }
+
+@media (max-width: 420px) {
+    .footer-social .social-link--tiktok { width: 64px; height: 64px; margin-top: 4px; }
+    .footer-social lottie-player.social-tiktok { transform: scale(1.15); }
 }
 
 /* Footer Bottom */
