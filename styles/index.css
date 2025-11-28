@@ -99,6 +99,39 @@ body {
     overflow: hidden;
 }
 
+/* Page transition states: used when navigating between index.html and dynamic.html */
+.container { transition: none; }
+body.page-exit .container { opacity: 1; transform: none; pointer-events: auto; }
+/* No page-enter/exit visual changes for instant switching */
+body.page-enter .container { opacity: 1; transform: none; }
+.body-disabled-clicks * { pointer-events: none !important; }
+
+/* Navigation overlay 'goo' effect (originates from click position and expands into black gradient) */
+/* Hide the old overlay/spinner styles to make switching instant/smooth */
+.nav-overlay { display: none !important; }
+.nav-overlay--active, .nav-overlay--incoming, .nav-overlay .vignette { display: none !important; }
+
+/* Circle expands from origin into fullscreen black goo */
+.nav-overlay .circle{position:absolute;left:var(--gx);top:var(--gy);width:120px;height:120px;transform:translate(-50%,-50%) scale(.01);border-radius:50%;background:radial-gradient(circle at 50% 40%, rgba(255,255,255,1), rgba(255,255,255,1)); transition:transform 540ms cubic-bezier(.2,.9,.2,1), opacity 380ms ease}
+.nav-overlay--active .circle{transform:translate(-50%,-50%) scale(40);opacity:1}
+.nav-overlay--hidden .circle{transform:translate(-50%,-50%) scale(.01);opacity:0}
+
+/* Logo loader centered UI */
+.nav-loader{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.95);z-index:100000;width:86px;height:86px;border-radius:999px;background:rgba(255,255,255,1);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 40px rgba(255,255,255,0.06);opacity:0;transition:transform 420ms cubic-bezier(.2,.9,.2,1),opacity 360ms ease}
+.nav-loader svg{width:44px;height:44px}
+.nav-loader--active{opacity:1;transform:translate(-50%,-50%) scale(1.08)}
+.nav-loader--hide{opacity:0;transform:translate(-50%,-50%) scale(.86)}
+
+/* Spin animation for loader logo: 1.5s linear, single iteration */
+@keyframes spin-1p5 { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+.nav-loader--active svg { animation: spin-1p5 1.5s linear 1 both; transform-origin: 50% 50%; }
+
+/* Force a light body background while overlay is active to avoid the purple gradient showing */
+body.light-bg { background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,1)); }
+
+
+
+
 @media (max-width: 768px) {
     .container {
         max-width: 420px;
@@ -1851,7 +1884,7 @@ button:hover, button:focus, button:active,
 
 .footer-links li a {
     font-size: 14px;
-    color: #cec8c8;
+    color: #ffffff;
     text-decoration: none;
     transition: all 0.3s ease;
     display: inline-block;
@@ -1926,7 +1959,6 @@ button:hover, button:focus, button:active,
     flex: 0 0 100%; /* take the full width of the flex container */
     width: 100%;
     text-align: center;
-  
     color: rgba(255,255,255,0.92);
     font-weight: 600;
     font-size: 16px;

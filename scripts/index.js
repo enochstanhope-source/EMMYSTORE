@@ -313,13 +313,44 @@ favButtons.forEach(btn => {
     });
 });
 
-// Scroll card into center when clicked
+// Card click: store product and navigate to product detail page
 const collectionCards = document.querySelectorAll('.collection-card');
 collectionCards.forEach(card => {
-    card.addEventListener('click', function() {
-        if (this.scrollIntoView) {
-            this.scrollIntoView({behavior: 'smooth', inline: 'center', block: 'nearest'});
-        }
+    card.addEventListener('click', function(e) {
+        // Ignore clicks that happen on interactive child elements (fav, add-to-cart buttons)
+        if (e.target.closest('.price-add-btn, .fav-btn, button, a')) return;
+
+        // Build product object from the card's DOM
+        const titleEl = this.querySelector('.card-title');
+        const priceEl = this.querySelector('.price-text, .price');
+        const imgEl = this.querySelector('img');
+        const descEl = this.querySelector('.product-desc');
+        const ratingValEl = this.querySelector('.rating .rating-value');
+        const reviewsCountEl = this.querySelector('.reviews-count');
+        const badgeEl = this.querySelector('.badge');
+
+        // Normalize image path so it works from dynamic.html (root) and from index.html location
+        let imgSrc = imgEl ? imgEl.getAttribute('src') : '';
+        if (imgSrc && !/^https?:|^\/|^EMMYSTORE-main\//.test(imgSrc)) imgSrc = 'EMMYSTORE-main/' + imgSrc.replace(/^\.\//, '');
+
+        const product = {
+            id: this.dataset.productId || (titleEl ? titleEl.textContent.trim().toLowerCase().replace(/\s+/g,'-') : 'item'),
+            title: titleEl ? titleEl.textContent.trim() : '',
+            priceText: priceEl ? priceEl.textContent.trim() : '',
+            image: imgSrc || '',
+            images: [(imgSrc || '')],
+            imageAlt: imgEl ? imgEl.getAttribute('alt') : '',
+            description: descEl ? descEl.textContent.trim() : '',
+            rating: ratingValEl ? ratingValEl.textContent.trim() : '',
+            reviews: reviewsCountEl ? reviewsCountEl.textContent.trim() : '',
+            badge: badgeEl ? badgeEl.textContent.trim() : '',
+            sizes: this.dataset.sizes ? this.dataset.sizes.split(',') : ['S','M','L','XL'],
+            colors: this.dataset.colors ? this.dataset.colors.split(',') : ['#e9e3d7', '#F4D2A3', '#ddd']
+        };
+
+        try { localStorage.setItem('selectedProduct', JSON.stringify(product)); } catch (err) { console.warn('Unable to save selectedProduct', err); }
+        // Instant switch: navigate immediately with no animations or delays.
+        try { window.location.href = '../dynamic.html'; } catch (err) { window.location.href = '../dynamic.html'; }
     });
 });
 
@@ -641,5 +672,18 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (err) { /* ignore */ }
         } catch (err) { /* ignore */ }
     });
+    // Page entry animation for a smooth transition on load
+    try {
+        document.body.classList.add('page-enter');
+        document.body.classList.remove('page-exit');
+        // remove disabled clicks flag if present
+        document.body.classList.remove('body-disabled-clicks');
+        requestAnimationFrame(() => {
+            // Removing the class triggers the CSS transition animation to show the page
+            document.body.classList.remove('page-enter');
+            // ensure we don't keep pointer-events disabled
+            setTimeout(() => { document.body.classList.remove('body-disabled-clicks'); }, 500);
+        });
+    } catch (err) {}
 });
 
